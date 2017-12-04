@@ -1,20 +1,14 @@
 /**
  *  @brief
- *      Copies the Elf memory to a binary file (stdout) on the Raspberry Pi. 
+ *      Copies a Raspberry Pi binary file (stdin) to the Elf memory. 
  * 
  *      The Raspberry Pi GPIO is used as interface to the Cosmac Elf SBC 
  *      (e.g. Elf Membership Card parallel port).
  * 
  *      http://spyr.ch/twiki/bin/view/Cosmac/RaspiElf
  *
- *   	synopsis
- *		 $ elf2bin [-s <hexadr>] [-e <hexadr>]
- * 		The generated file goes to the standard output stream. 
- * 		Use  > for redirecting (save the file) or | for piping to 
- * 		another command (e.g. bin2hex)
- *  
- *  @file 
- *      elf2bin.c
+ *  @file
+ *      bin2elf.c
  *  @author
  *      Peter Schmid, peter@spyr.ch
  *  @date
@@ -52,7 +46,7 @@
 int main(int argc, char *argv[]) {
     int i;
     int opt;
-    char data;
+    int data;
     uint16_t start_adr = START_ADR;
     uint16_t end_adr = END_ADR;
     FILE *fp;
@@ -73,49 +67,57 @@ int main(int argc, char *argv[]) {
                 exit(EXIT_FAILURE);
         }
     }
-    
-    fp = stdout;
+
+    fp = stdin;
     if (optind < argc) {
-		// there is a filename parameter, use it instead of stdout
-		fp = fopen(argv[optind], "w");
+		// there is a filename parameter, use it instead of stdin
+		fp = fopen(argv[optind], "r");
 		if (fp == NULL) {
 			fprintf(stderr, 
 			  "Cannot open file \"%s\"\n", 
 			  argv[optind]);
 			exit(EXIT_FAILURE);
 		}
-
 	}
-	
+    
     if (init_ports() != 0) {
         // can't init ports
         exit(EXIT_FAILURE);
     }
     
+    for (i = 0; i < start_adr; i++) {
+        // count up to the start address
+        digitalWrite(IN_N, 0);
+        digitalWrite(IN_N, 1);        
+    }
+    
+    // write
+    digitalWrite(WE_N, 0);
+   
     int j = 0;
-    for(i = 0; i <= end_adr; i++) {
+    while ((data = fgetc(fp)) != EOF) {
+		write_byte(data);
+		j++;
+        
         // in clock
         digitalWrite(IN_N, 0);
         digitalWrite(IN_N, 1);
-        
-        if (i >= start_adr) {
-            data = read_byte();
-            fputc(data, fp);
-            j++;
+   
+        if (++i > end_adr) {
+            break;
         }
     }
     
     // read
-    //digitalWrite(WE_N, 1);
+    digitalWrite(WE_N, 1);
     
     // run  
     digitalWrite(WAIT_N, 1);
     digitalWrite(CLEAR_N, 1);
     
-	fprintf(stderr, "0x%04x bytes read\n", j);
-	
-	fclose(fp);
-
+    fprintf(stderr, "0x%04x bytes written\n", j);
+    
+    fclose(fp);
 }
 
 

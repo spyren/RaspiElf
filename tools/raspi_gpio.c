@@ -1,6 +1,8 @@
 /**
  *  @brief
- *      Copies the Elf (Membership Card) memory to a binary file. 
+ *      Interface to the Elf Membership Card.
+ * 
+ * 		The wiringPi library is used to control the GPIOs. 
  *
  *  @file
  *      raspi_gpio.c
