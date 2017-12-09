@@ -73,7 +73,7 @@
  *  @brief
  *      Initialises the Raspi GPIO ports
  *  @return
- *      None
+ *      int		error number -1 wiringPi, -2 any switch to ground
  */
 /* ===================================================================*/
 int init_ports(void) {
@@ -91,6 +91,14 @@ int init_ports(void) {
     pinMode(CLEAR_N, OUTPUT);
     digitalWrite(CLEAR_N, 1);
     
+    if (!digitalRead(WE_N) || !digitalRead(WAIT_N) || !digitalRead(CLEAR_N)) {
+		// any of the mode pins is low -> switch in wrong position
+		pinMode(WE_N, INPUT);
+		pinMode(WAIT_N, INPUT);
+		pinMode(CLEAR_N, INPUT);
+		return -2;
+	}
+	
     // in disable
     pinMode(IN_N, OUTPUT);
     digitalWrite(IN_N, 1);
@@ -111,7 +119,23 @@ int init_ports(void) {
     pinMode(OUTPUT_6, OUTPUT);
     pinMode(OUTPUT_7, OUTPUT);
     write_byte(0xFF);      
-    
+    if (!digitalRead(OUTPUT_0) || !digitalRead(OUTPUT_1) || 
+		!digitalRead(OUTPUT_2) || !digitalRead(OUTPUT_3) || 
+		!digitalRead(OUTPUT_4) || !digitalRead(OUTPUT_5) ||
+		!digitalRead(OUTPUT_6) || !digitalRead(OUTPUT_7)) 
+	{
+		// any of the data out pins is low -> switch in wrong position
+		pinMode(OUTPUT_0, INPUT);
+		pinMode(OUTPUT_1, INPUT);
+		pinMode(OUTPUT_2, INPUT);
+		pinMode(OUTPUT_3, INPUT);
+		pinMode(OUTPUT_4, INPUT);
+		pinMode(OUTPUT_5, INPUT);
+		pinMode(OUTPUT_6, INPUT);
+		pinMode(OUTPUT_7, INPUT);
+		return -2;
+	}
+	    
     pinMode(INPUT_0, INPUT);
     pinMode(INPUT_1, INPUT);
     pinMode(INPUT_2, INPUT);

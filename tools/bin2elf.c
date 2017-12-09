@@ -7,6 +7,13 @@
  * 
  *      http://spyr.ch/twiki/bin/view/Cosmac/RaspiElf
  *
+ *   	synopsis
+ *		 $ bin2elf [-s <hexadr>] [-e <hexadr>] [<filename>]
+ * 		The file is read from stdin in or <filename>.
+ * 		-s start address in hex
+ * 		-e end adress in hex
+ * 		-w write
+ * 		-r run
  *  @file
  *      bin2elf.c
  *  @author
@@ -91,7 +98,7 @@ int main(int argc, char *argv[]) {
         digitalWrite(IN_N, 1);        
     }
     
-    // write
+    // write enable
     digitalWrite(WE_N, 0);
    
     int j = 0;
@@ -108,7 +115,7 @@ int main(int argc, char *argv[]) {
         }
     }
     
-    // read
+    // read (disable write)
     digitalWrite(WE_N, 1);
     
     // run  

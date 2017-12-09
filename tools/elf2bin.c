@@ -1,6 +1,6 @@
 /**
  *  @brief
- *      Copies the Elf memory to a binary file (stdout) on the Raspberry Pi. 
+ *      Copies the Elf memory to a binary file (or stdout) on the Raspberry Pi. 
  * 
  *      The Raspberry Pi GPIO is used as interface to the Cosmac Elf SBC 
  *      (e.g. Elf Membership Card parallel port).
@@ -8,10 +8,13 @@
  *      http://spyr.ch/twiki/bin/view/Cosmac/RaspiElf
  *
  *   	synopsis
- *		 $ elf2bin [-s <hexadr>] [-e <hexadr>]
- * 		The generated file goes to the standard output stream. 
+ *		 $ elf2bin [-s <hexadr>] [-e <hexadr>] [<filename>]
+ * 		The generated data is written to the standard output stream or to
+ * 		<filename>. Caution: Overwrite file if it exists.  
  * 		Use  > for redirecting (save the file) or | for piping to 
- * 		another command (e.g. bin2hex)
+ * 		another command (e.g. hexdump)
+ * 		-s start address in hex
+ * 		-e end adress in hex
  *  
  *  @file 
  *      elf2bin.c
@@ -115,6 +118,8 @@ int main(int argc, char *argv[]) {
 	fprintf(stderr, "0x%04x bytes read\n", j);
 	
 	fclose(fp);
+	
+	exit (0);
 
 }
 
