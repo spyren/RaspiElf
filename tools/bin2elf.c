@@ -12,8 +12,8 @@
  * 		The file is read from stdin in or <filename>.
  * 		-s start address in hex
  * 		-e end adress in hex
- * 		-w write
- * 		-r run
+ * 		-w write enable
+ * 		-r run mode
  *  @file
  *      bin2elf.c
  *  @author
@@ -54,12 +54,14 @@ int main(int argc, char *argv[]) {
     int i;
     int opt;
     int data;
+    uint8_t run_mode = FALSE;
+    uint8_t write_mode = FALSE;
     uint16_t start_adr = START_ADR;
     uint16_t end_adr = END_ADR;
     FILE *fp;
     
     // parse command line options
-    while ((opt = getopt(argc, argv, "s:e:")) != -1) {
+    while ((opt = getopt(argc, argv, "s:e:wr")) != -1) {
         switch (opt) {
             case 's': 
                 start_adr = strtol(optarg, NULL, 16);
@@ -67,9 +69,15 @@ int main(int argc, char *argv[]) {
             case 'e': 
                 end_adr = strtol(optarg, NULL, 16);
                 break;
+            case 'w':
+				write_mode = TRUE;
+				break;
+            case 'r':
+				run_mode = TRUE;
+				break;
             default:
                 fprintf(stderr, 
-                  "Usage: %s [-s <adr>] [-e <adr>] [<filename>]\n", 
+                  "Usage: %s [-s <adr>] [-e <adr>] [-w] [-r] [<filename>]\n", 
                   argv[0]);
                 exit(EXIT_FAILURE);
         }
@@ -115,12 +123,19 @@ int main(int argc, char *argv[]) {
         }
     }
     
-    // read (disable write)
-    digitalWrite(WE_N, 1);
-    
-    // run  
-    digitalWrite(WAIT_N, 1);
-    digitalWrite(CLEAR_N, 1);
+    if (write_mode) {
+		// write enable
+		digitalWrite(WE_N, 0);
+	} else {
+		// read (disable write)
+		digitalWrite(WE_N, 1);
+	}
+	
+	if (run_mode) {
+		// run  
+		digitalWrite(WAIT_N, 1);
+		digitalWrite(CLEAR_N, 1);    
+	}
     
     fprintf(stderr, "0x%04x bytes written\n", j);
     

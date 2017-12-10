@@ -53,6 +53,8 @@
 #define INPUT_5     18
 #define INPUT_6     16
 #define INPUT_7     26
+#define RX_Q		15
+#define TX_EF3		14
 
 // default start and end address
 #define START_ADR   0x0000
@@ -64,7 +66,9 @@
  */
 /**
  *  @brief
- *  	Initialises the Raspi GPIO ports
+ *      Initialises the Raspi GPIO ports
+ *  @return
+ *      int		error number -1 wiringPi, -2 any switch to ground
  */
 /* ===================================================================*/
 int init_ports(void);
@@ -75,7 +79,11 @@ int init_ports(void);
  */
 /**
  *  @brief
- *  	Writes a byte to the Elf
+ *      Writes a byte (data switches) to the Elf
+ *  @param
+ *      byte    the data to write
+ *  @return
+ *      None
  */
 /* ===================================================================*/
 void write_byte(int byte);
@@ -86,9 +94,28 @@ void write_byte(int byte);
  */
 /**
  *  @brief
- *  	Reads a byte from the Elf
+ *      Reads a byte from the Elf
+ *  @param
+ *     
+ *  @return
+ *      The byte from the Elf
  */
 /* ===================================================================*/
 int read_byte(void);
+
+/*
+ ** ===================================================================
+ **  Method      :  read_switches
+ */
+/**
+ *  @brief
+ *      Reads the data switches from the Elf
+ *  @param
+ *     
+ *  @return
+ *      The byte from the Elf
+ */
+/* ===================================================================*/
+int read_switches(void);
 
 #endif /* RASPI_GPIO_H_ */
