@@ -95,7 +95,12 @@ int main(int argc, char *argv[]) {
 		}
 	}
     
-    if (init_ports() != 0) {
+    if (init_port_mode() != 0) {
+        // can't init ports
+        exit(EXIT_FAILURE);
+    }
+
+    if (init_port_level() != 0) {
         // can't init ports
         exit(EXIT_FAILURE);
     }

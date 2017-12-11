@@ -101,8 +101,8 @@ int main(int argc, char *argv[]) {
 				cmd = RUN_CMD;
 			} else if (strcmp(argv[optind], "wait") == 0) {
 				cmd = WAIT_CMD;
-			} else if (strcmp(argv[optind], "reset") == 0 || 
-						strcmp(argv[optind], "clear") == 0) {
+			} else if ((strcmp(argv[optind], "reset") == 0) || 
+						(strcmp(argv[optind], "clear") == 0)) {
 				cmd = RESET_CMD;
 			} else if (strcmp(argv[optind], "write") == 0 || 
 						strcmp(argv[optind], "we") == 0) {
@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
 		usage_exit(EXIT_FAILURE, argv[0]);
 	}
 
-    if (init_ports() != 0) {
+    if (init_port_mode() != 0) {
         // !! can't init ports
         exit(EXIT_FAILURE);
     }
@@ -206,7 +206,7 @@ int main(int argc, char *argv[]) {
 				read_switches() 		// SWITCH (Port In)		
 		);
 	} else {
-		// LED Q IN WAIT CLEAR WRITE SWITCH
+		// LED Q Rx IN WAIT CLEAR WRITE SWITCH
 		printf("%02x %1x %1x %1x %1x %1x %1x %02x\n", 
 				read_byte(), 			// LED (Port Out)
 				digitalRead(RX_Q), 		// Q, Tx
@@ -236,7 +236,7 @@ Usage: %s [-i] [-v] [-s <number>] [load|run|wait|reset|write|in|get|put] [<switc
 -n inverted command\n\
 -s count to the <number> address (hex)\n\
 <switch> data for the switches in hex\n\
-LED Q IN WAIT CLEAR WRITE SWITCH\n",
+LED Q Rx IN WAIT CLEAR WRITE SWITCH\n",
       str);
     exit(err_number);
 }

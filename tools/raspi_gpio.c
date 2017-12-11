@@ -42,42 +42,36 @@
 
 /*
  ** ===================================================================
- **  Method      :  init_ports
+ **  Method      :  init_port_level
  */
 /**
  *  @brief
- *      Initialises the Raspi GPIO ports
+ *      Initialises the Raspi GPIO port level
  *  @return
  *      int		error number -1 wiringPi, -2 any switch to ground
  */
 /* ===================================================================*/
-int init_ports(void) {
-    if (wiringPiSetupGpio() == -1) {
-        return -1;
-    }
-    
+int init_port_level(void) {
+
     // read mode
-    pinMode(WE_N, OUTPUT);
     digitalWrite(WE_N, 1);
     
     // run
-    pinMode(WAIT_N, OUTPUT);
     digitalWrite(WAIT_N, 1);
-    pinMode(CLEAR_N, OUTPUT);
     digitalWrite(CLEAR_N, 1);
     
-    if (!digitalRead(WE_N) || !digitalRead(WAIT_N) || !digitalRead(CLEAR_N)) {
+    // in disable
+    digitalWrite(IN_N, 1);
+
+    if (!digitalRead(WE_N) || !digitalRead(WAIT_N) || 
+		!digitalRead(CLEAR_N) || !digitalRead(IN_N)) {
 		// any of the mode pins is low -> switch in wrong position
 		pinMode(WE_N, INPUT);
 		pinMode(WAIT_N, INPUT);
 		pinMode(CLEAR_N, INPUT);
 		return -2;
 	}
-	
-    // in disable
-    pinMode(IN_N, OUTPUT);
-    digitalWrite(IN_N, 1);
-    
+	 
     // reset
     digitalWrite(CLEAR_N, 0);
     
@@ -131,6 +125,65 @@ int init_ports(void) {
 
     return 0;
 }
+
+/*
+ ** ===================================================================
+ **  Method      :  init_port_mode
+ */
+/**
+ *  @brief
+ *      Initialises the Raspi GPIO port mode (direction, pullups)
+ *  @return
+ *      int		error number -1 wiringPi, -2 any switch to ground
+ */
+/* ===================================================================*/
+int init_port_mode(void) {
+    if (wiringPiSetupGpio() == -1) {
+        return -1;
+    }
+    
+    // read mode
+    pinMode(WE_N, OUTPUT);
+    
+    // run
+    pinMode(WAIT_N, OUTPUT);
+    pinMode(CLEAR_N, OUTPUT);
+    	
+    // in 
+    pinMode(IN_N, OUTPUT);
+      
+    // all outputs (switches)
+    pinMode(OUTPUT_0, OUTPUT);
+    pinMode(OUTPUT_1, OUTPUT);
+    pinMode(OUTPUT_2, OUTPUT);
+    pinMode(OUTPUT_3, OUTPUT);
+    pinMode(OUTPUT_4, OUTPUT);
+    pinMode(OUTPUT_5, OUTPUT);
+    pinMode(OUTPUT_6, OUTPUT);
+    pinMode(OUTPUT_7, OUTPUT);
+	    
+	// all inputs (LED)
+    pinMode(INPUT_0, INPUT);
+    pinMode(INPUT_1, INPUT);
+    pinMode(INPUT_2, INPUT);
+    pinMode(INPUT_3, INPUT);
+    pinMode(INPUT_4, INPUT);
+    pinMode(INPUT_5, INPUT);
+    pinMode(INPUT_6, INPUT);
+    pinMode(INPUT_7, INPUT);
+    // input pins have pull ups
+    pullUpDnControl (INPUT_0, PUD_UP) ;
+    pullUpDnControl (INPUT_1, PUD_UP) ;
+    pullUpDnControl (INPUT_2, PUD_UP) ;
+    pullUpDnControl (INPUT_3, PUD_UP) ;
+    pullUpDnControl (INPUT_4, PUD_UP) ;
+    pullUpDnControl (INPUT_5, PUD_UP) ;
+    pullUpDnControl (INPUT_6, PUD_UP) ;
+    pullUpDnControl (INPUT_7, PUD_UP) ;
+
+    return 0;
+}
+    
     
 /*
  ** ===================================================================

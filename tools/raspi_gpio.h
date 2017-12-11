@@ -50,7 +50,7 @@
 #define INPUT_2     6
 #define INPUT_3     12
 #define INPUT_4     13
-#define INPUT_5     18
+#define INPUT_5     19
 #define INPUT_6     16
 #define INPUT_7     26
 #define RX_Q		15
@@ -60,18 +60,33 @@
 #define START_ADR   0x0000
 #define END_ADR     0xFFFF
 
+
 /*
  ** ===================================================================
- **  Method      :  init_ports
+ **  Method      :  init_port_level
  */
 /**
  *  @brief
- *      Initialises the Raspi GPIO ports
+ *      Initialises the Raspi GPIO port level
  *  @return
  *      int		error number -1 wiringPi, -2 any switch to ground
  */
 /* ===================================================================*/
-int init_ports(void);
+int init_port_level(void);
+
+/*
+ ** ===================================================================
+ **  Method      :  init_port_mode
+ */
+/**
+ *  @brief
+ *      Initialises the Raspi GPIO port mode (direction, pullups)
+ *  @return
+ *      int		error number -1 wiringPi, -2 any switch to ground
+ */
+/* ===================================================================*/
+int init_port_mode(void);
+
 
 /*
  ** ===================================================================
