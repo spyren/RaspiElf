@@ -53,8 +53,8 @@
 /* ===================================================================*/
 int init_port_level(void) {
 
-    // read mode
-    digitalWrite(WE_N, 1);
+    // write mode
+    digitalWrite(READ_N, 1);
     
     // run
     digitalWrite(WAIT_N, 1);
@@ -63,10 +63,10 @@ int init_port_level(void) {
     // in disable
     digitalWrite(IN_N, 1);
 
-    if (!digitalRead(WE_N) || !digitalRead(WAIT_N) || 
+    if (!digitalRead(READ_N) || !digitalRead(WAIT_N) || 
 		!digitalRead(CLEAR_N) || !digitalRead(IN_N)) {
 		// any of the mode pins is low -> switch in wrong position
-		pinMode(WE_N, INPUT);
+		pinMode(READ_N, INPUT);
 		pinMode(WAIT_N, INPUT);
 		pinMode(CLEAR_N, INPUT);
 		return -2;
@@ -143,7 +143,7 @@ int init_port_mode(void) {
     }
     
     // read mode
-    pinMode(WE_N, OUTPUT);
+    pinMode(READ_N, OUTPUT);
     
     // run
     pinMode(WAIT_N, OUTPUT);

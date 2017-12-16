@@ -1,0 +1,107 @@
+                        ;	TITL	"Chase Lighting for Elf Memebership Card"
+                        ;		EJCT	60
+                        
+                        		CPU	1802
+                        
+      NUMBER		EQU	0
+                        
+                        ;
+                        ; Register Definitions:
+                        ;
+      R0		EQU	0
+      R1		EQU	1
+      R2		EQU	2
+      R3		EQU	3
+      R4		EQU	4
+      R5		EQU	5
+      R6		EQU	6
+      R7		EQU	7
+      R8		EQU	8
+      R9		EQU	9
+      R10		EQU	10
+      R11		EQU	11
+      R12		EQU	12
+      R13		EQU	13
+      R14		EQU	14
+      R15		EQU	15
+                        
+                        ;
+                        ; I/O Port Definitions:
+                        ;
+      P1		EQU	1
+      P2		EQU	2
+      P3		EQU	3
+      P4		EQU	4
+      P5		EQU	5
+      P6		EQU	6
+      P7		EQU	7	
+                        
+      		ORG	0H
+                        		
+   0000   c0:11000000 		LBR 	MOVE
+   0001   00:00000000
+   0002   03:00000011
+                        	
+      MOVE
+   0003   e3:11100011 		SEX 	R3		; index register R3 for bit pattern point to 30H
+   0004   90:10010000 		GHI 	R0		; PC high byte is 0
+   0005   b3:10110011 		PHI 	R3
+   0006   f8:11111000 		LDI 	30H
+   0007   30:00110000
+   0008   a3:10100011 		PLO 	R3
+                        
+   0009   f8:11111000 		LDI	00000001B	; bit pattern to move in (0030H)
+   000a   01:00000001
+   000b   53:01010011 		STR 	R3
+      LOOP
+   000c   64:01100100 		OUT	P4		; Rx = 0030H, INC Rx
+   000d   6c:01101100 		INP	P4		; get switches Rx =0031H
+   000e   23:00100011 		DEC 	R3		; Rx = 0030H
+   000f   fa:11111010 		ANI 	11111110B
+   0010   fe:11111110
+   0011   3a:00111010 		BNZ 	LEFT
+   0012   1a:00011010
+      RIGHT
+   0013   f0:11110000 		LDX			; get pattern
+   0014   f6:11110110 		SHR
+   0015   c7:11000111 		LSNF
+   0016   f8:11111000 		LDI 	10000000B   
+   0017   80:10000000
+   0018   30:00110000 		BR  	STORE
+   0019   1f:00011111
+      LEFT
+   001a   f0:11110000 		LDX			; get pattern
+   001b   fe:11111110 		SHL
+   001c   c7:11000111 		LSNF
+   001d   f8:11111000 		LDI 	00000001B
+   001e   01:00000001
+      STORE
+   001f   53:01010011 		STR 	R3
+                        
+   0020   f8:11111000 		LDI 	20
+   0021   14:00010100
+   0022   b2:10110010 		PHI 	R2		; R2 wait counter
+      WAIT
+   0023   22:00100010 		DEC 	R2		; wait loop about 0.5 s
+   0024   92:10010010 		GHI 	R2
+   0025   3a:00111010 		BNZ 	WAIT
+   0026   23:00100011
+                        
+   0027   c5:11000101 		LSNQ      		; toggle Q
+   0028   7a:01111010 		REQ
+   0029   38:00111000 		NBR	7bH		; SEQ 
+   002a   7b:01111011
+                        		;SEQ
+   002b   30:00110000 		BR 	LOOP
+   002c   0c:00001100
+                        
+      		END
+001a  LEFT          000c  LOOP          0003  MOVE          0000  NUMBER    
+0001  P1            0002  P2            0003  P3            0004  P4        
+0005  P5            0006  P6            0007  P7            0000  R0        
+0001  R1            000a  R10           000b  R11           000c  R12       
+000d  R13           000e  R14           000f  R15           0002  R2        
+0003  R3            0004  R4            0005  R5            0006  R6        
+0007  R7            0008  R8            0009  R9            0013  RIGHT     
+001f  STORE         0023  WAIT          
+

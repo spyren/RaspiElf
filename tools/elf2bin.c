@@ -15,7 +15,7 @@
  * 		another command (e.g. hexdump)
  * 		-s start address in hex
  * 		-e end adress in hex
- * 		-w write enable
+ * 		-w read enable
  * 		-r run mode
  *  
  *  @file 
@@ -110,6 +110,8 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
     
+    // read
+    digitalWrite(READ_N, 0);
     int j = 0;
     for(i = 0; i <= end_adr; i++) {
         // in clock
@@ -125,10 +127,10 @@ int main(int argc, char *argv[]) {
     
     if (write_mode) {
 		// write enable
-		digitalWrite(WE_N, 0);
+		digitalWrite(READ_N, 1);
 	} else {
-		// read (disable write)
-		digitalWrite(WE_N, 1);
+		// read 
+		digitalWrite(READ_N, 0);
 	}
 	
 	if (run_mode) {

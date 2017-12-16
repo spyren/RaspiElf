@@ -51,7 +51,7 @@
 #include <wiringPi.h>
 #include "raspi_gpio.h"
 
-typedef enum {LOAD_CMD, RUN_CMD, WAIT_CMD, RESET_CMD, WRITE_CMD, 
+typedef enum {LOAD_CMD, RUN_CMD, WAIT_CMD, RESET_CMD, READ_CMD, 
 	IN_CMD, GET_CMD, PUT_CMD} command_t;
 
 void usage_exit(int err_number, const char *str);
@@ -104,9 +104,9 @@ int main(int argc, char *argv[]) {
 			} else if ((strcmp(argv[optind], "reset") == 0) || 
 						(strcmp(argv[optind], "clear") == 0)) {
 				cmd = RESET_CMD;
-			} else if (strcmp(argv[optind], "write") == 0 || 
-						strcmp(argv[optind], "we") == 0) {
-				cmd = WRITE_CMD;
+			} else if (strcmp(argv[optind], "read") == 0 || 
+						strcmp(argv[optind], "rd") == 0) {
+				cmd = READ_CMD;
 			} else if (strcmp(argv[optind], "in") == 0) {
 				cmd = IN_CMD;
 			} else if (strcmp(argv[optind], "get") == 0) {
@@ -171,11 +171,11 @@ int main(int argc, char *argv[]) {
 			    digitalWrite(CLEAR_N, 0);
 			}
 			break;
-		case WRITE_CMD:
+		case READ_CMD:
 			if (inverted_mode) {
-			    digitalWrite(WE_N, 1);
+			    digitalWrite(READ_N, 1);
 			} else {
-			    digitalWrite(WE_N, 0);
+			    digitalWrite(READ_N, 0);
 			}
 			break;
 		case IN_CMD:
@@ -195,14 +195,14 @@ int main(int argc, char *argv[]) {
 
 	// always get
 	if (verbose_mode) {
-		printf("LED:%02x Q:%1x Rx:%1x IN:%1x WAIT:%1x CLR:%1x WE:%1x SWITCH:%02x\n", 
+		printf("LED:%02x Q:%1x Rx:%1x IN:%1x WAIT:%1x CLR:%1x READ:%1x SWITCH:%02x\n", 
 				read_byte(), 			// LED (Port Out)
 				digitalRead(RX_Q), 		// Q, Tx
 				digitalRead(TX_EF3),	// Rx (EF3)
 				!digitalRead(IN_N),		// IN (EF4)
 				!digitalRead(WAIT_N),	// WAIT
 				!digitalRead(CLEAR_N),	// CLEAR
-				!digitalRead(WE_N),		// WRITE
+				!digitalRead(READ_N),	// READ
 				read_switches() 		// SWITCH (Port In)		
 		);
 	} else {
@@ -214,7 +214,7 @@ int main(int argc, char *argv[]) {
 				!digitalRead(IN_N),		// IN (EF4)
 				!digitalRead(WAIT_N),	// WAIT
 				!digitalRead(CLEAR_N),	// CLEAR
-				!digitalRead(WE_N),		// WRITE
+				!digitalRead(READ_N),	// READ
 				read_switches() 		// SWITCH (Port In)
 		); 
 	}
@@ -230,7 +230,7 @@ int main(int argc, char *argv[]) {
 
 void usage_exit(int err_number, const char *str) {
 	fprintf(stderr, "\
-Usage: %s [-i] [-v] [-s <number>] [load|run|wait|reset|write|in|get|put] [<switch>]\n\
+Usage: %s [-i] [-v] [-s <number>] [load|run|wait|reset|read|in|get|put] [<switch>]\n\
 -i post increment IN\n\
 -v verbose\n\
 -n inverted command\n\
