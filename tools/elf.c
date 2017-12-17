@@ -139,6 +139,8 @@ int main(int argc, char *argv[]) {
         // !! can't init ports
         exit(EXIT_FAILURE);
     }
+    
+    usleep(1000);
 
 	if (start_mode) {
 		for (i = 0; i < start_adr; i++) {
@@ -173,9 +175,9 @@ int main(int argc, char *argv[]) {
 			break;
 		case READ_CMD:
 			if (inverted_mode) {
-			    digitalWrite(READ_N, 1);
+			    digitalWrite(WRITE_N, 0);
 			} else {
-			    digitalWrite(READ_N, 0);
+			    digitalWrite(WRITE_N, 1);
 			}
 			break;
 		case IN_CMD:
@@ -202,7 +204,7 @@ int main(int argc, char *argv[]) {
 				!digitalRead(IN_N),		// IN (EF4)
 				!digitalRead(WAIT_N),	// WAIT
 				!digitalRead(CLEAR_N),	// CLEAR
-				!digitalRead(READ_N),	// READ
+				digitalRead(WRITE_N),	// READ
 				read_switches() 		// SWITCH (Port In)		
 		);
 	} else {
@@ -214,14 +216,16 @@ int main(int argc, char *argv[]) {
 				!digitalRead(IN_N),		// IN (EF4)
 				!digitalRead(WAIT_N),	// WAIT
 				!digitalRead(CLEAR_N),	// CLEAR
-				!digitalRead(READ_N),	// READ
+				digitalRead(WRITE_N),	// READ
 				read_switches() 		// SWITCH (Port In)
 		); 
 	}
 	
     if (increment_mode) {
 		// post increment
+        usleep(100);
         digitalWrite(IN_N, 0);
+        usleep(100);
         digitalWrite(IN_N, 1);        		
 	}
      

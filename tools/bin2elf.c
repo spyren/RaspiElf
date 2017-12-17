@@ -106,15 +106,17 @@ int main(int argc, char *argv[]) {
     }
     
     // read
-    digitalWrite(READ_N, 0);
+    digitalWrite(WRITE_N, 1);
     for (i = 0; i < start_adr; i++) {
         // count up to the start address
         digitalWrite(IN_N, 0);
+        usleep(100);
         digitalWrite(IN_N, 1);        
+        usleep(100);
     }
     
     // write enable
-    digitalWrite(READ_N, 1);
+    digitalWrite(WRITE_N, 0);
    
     int j = 0;
     while ((data = fgetc(fp)) != EOF) {
@@ -123,8 +125,10 @@ int main(int argc, char *argv[]) {
         
         // in clock
         digitalWrite(IN_N, 0);
+        usleep(100);
         digitalWrite(IN_N, 1);
-   
+        usleep(100);
+  
         if (++i > end_adr) {
             break;
         }
@@ -132,10 +136,10 @@ int main(int argc, char *argv[]) {
     
     if (write_mode) {
 		// write enable
-		digitalWrite(READ_N, 1);
+		digitalWrite(WRITE_N, 0);
 	} else {
 		// read (disable write)
-		digitalWrite(READ_N, 0);
+		digitalWrite(WRITE_N, 1);
 	}
 	
 	if (run_mode) {

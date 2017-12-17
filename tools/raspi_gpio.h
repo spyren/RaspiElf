@@ -36,7 +36,7 @@
 #define IN_N        4
 #define WAIT_N      17
 #define CLEAR_N     18
-#define READ_N      27
+#define WRITE_N     27
 #define OUTPUT_0    22
 #define OUTPUT_1    23
 #define OUTPUT_2    24

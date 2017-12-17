@@ -111,13 +111,14 @@ int main(int argc, char *argv[]) {
     }
     
     // read
-    digitalWrite(READ_N, 0);
+    digitalWrite(WRITE_N, 1);
     int j = 0;
     for(i = 0; i <= end_adr; i++) {
         // in clock
         digitalWrite(IN_N, 0);
+        usleep(100);
         digitalWrite(IN_N, 1);
-        
+        usleep(100);        
         if (i >= start_adr) {
             data = read_byte();
             fputc(data, fp);
@@ -127,10 +128,10 @@ int main(int argc, char *argv[]) {
     
     if (write_mode) {
 		// write enable
-		digitalWrite(READ_N, 1);
+		digitalWrite(WRITE_N, 0);
 	} else {
 		// read 
-		digitalWrite(READ_N, 0);
+		digitalWrite(WRITE_N, 1);
 	}
 	
 	if (run_mode) {
