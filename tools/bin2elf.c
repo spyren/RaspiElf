@@ -104,6 +104,16 @@ int main(int argc, char *argv[]) {
         // can't init ports
         exit(EXIT_FAILURE);
     }
+
+	// load
+	digitalWrite(WAIT_N, 0);
+	digitalWrite(CLEAR_N, 0);
+    usleep(100);
+	// reset
+	digitalWrite(WAIT_N, 1);
+    usleep(100);
+	digitalWrite(WAIT_N, 0);
+    usleep(100);
     
     // read
     digitalWrite(WRITE_N, 1);
@@ -145,6 +155,8 @@ int main(int argc, char *argv[]) {
 	if (run_mode) {
 		// run  
 		digitalWrite(WAIT_N, 1);
+		// reset
+		usleep(100);
 		digitalWrite(CLEAR_N, 1);    
 	}
     

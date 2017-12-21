@@ -100,6 +100,7 @@ int main(int argc, char *argv[]) {
 
 	}
 	
+			
     if (init_port_mode() != 0) {
         // can't init ports
         exit(EXIT_FAILURE);
@@ -109,9 +110,20 @@ int main(int argc, char *argv[]) {
         // can't init ports
         exit(EXIT_FAILURE);
     }
+
+	// read 
+	digitalWrite(WRITE_N, 1);
+	
+	// load
+	digitalWrite(WAIT_N, 0);
+	digitalWrite(CLEAR_N, 0);
+    usleep(100);
+	// reset
+	digitalWrite(WAIT_N, 1);
+    usleep(100);
+	digitalWrite(WAIT_N, 0);
+    usleep(100);
     
-    // read
-    digitalWrite(WRITE_N, 1);
     int j = 0;
     for(i = 0; i <= end_adr; i++) {
         // in clock
@@ -137,6 +149,8 @@ int main(int argc, char *argv[]) {
 	if (run_mode) {
 		// run  
 		digitalWrite(WAIT_N, 1);
+		// reset
+		usleep(100);
 		digitalWrite(CLEAR_N, 1);    
 	}
     
