@@ -12,7 +12,7 @@
  *  @author
  *      Peter Schmid, peter@spyr.ch
  *  @date
- *      2017-11-30
+ *      2018-05-10
  *  @remark
  *      Language: gcc version 4.9.2 on Raspberry Pi 3, Raspbian
  *  @copyright
@@ -42,7 +42,9 @@
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 
-//#include "raspi_gpio.h"
+#include "microdot_phat_hex.h"
+
+#define debug		0
 
 #define DRIVER_BASE	(0x61)
 
@@ -63,155 +65,156 @@
   
 const uint8_t font_til311[16][7]={
 {	// 0 
-0b0000110,
-0b0001001,
-0b0001001,
-0b0001001,
-0b0001001,
-0b0001001,
-0b0000110
+0b0110,
+0b1001,
+0b1001,
+0b1001,
+0b1001,
+0b1001,
+0b0110
 },
 {	// 1
-0b0000001,
-0b0000001,
-0b0000001,
-0b0000001,
-0b0000001,
-0b0000001,
-0b0000001
+0b0001,
+0b0001,
+0b0001,
+0b0001,
+0b0001,
+0b0001,
+0b0001
 },
 {	// 2 
-0b0001110,
-0b0000001,
-0b0000001,
-0b0000110,
-0b0001000,
-0b0001000,
-0b0001111
+0b1110,
+0b0001,
+0b0001,
+0b0110,
+0b1000,
+0b1000,
+0b1111
 },
 {	// 3 
-0b0001110,
-0b0000001,
-0b0000001,
-0b0000110,
-0b0000001,
-0b0000001,
-0b0001110
+0b1110,
+0b0001,
+0b0001,
+0b0110,
+0b0001,
+0b0001,
+0b1110
 },
 {	// 4 
-0b0001000,
-0b0001001,
-0b0001001,
-0b0001111,
-0b0000001,
-0b0000001,
-0b0000001
+0b1000,
+0b1001,
+0b1001,
+0b1111,
+0b0001,
+0b0001,
+0b0001
 },
 {	// 5
-0b0001111,
-0b0001000,
-0b0001000,
-0b0001110,
-0b0000001,
-0b0000001,
-0b0001110
+0b1111,
+0b1000,
+0b1000,
+0b1110,
+0b0001,
+0b0001,
+0b1110
 },
 {	// 6 
-0b0000110,
-0b0001000,
-0b0001000,
-0b0001110,
-0b0001001,
-0b0001001,
-0b0000110
+0b0110,
+0b1000,
+0b1000,
+0b1110,
+0b1001,
+0b1001,
+0b0110
 },
 {	// 7
-0b0001111,
-0b0000001,
-0b0000001,
-0b0000001,
-0b0000001,
-0b0000001,
-0b0000001
+0b1111,
+0b0001,
+0b0001,
+0b0001,
+0b0001,
+0b0001,
+0b0001
 },
 {	// 8
-0b0000110,
-0b0001001,
-0b0001001,
-0b0000110,
-0b0001001,
-0b0001001,
-0b0000110
+0b0110,
+0b1001,
+0b1001,
+0b0110,
+0b1001,
+0b1001,
+0b0110
 },
 {	// 9
-0b0000110,
-0b0001001,
-0b0001001,
-0b0000111,
-0b0000001,
-0b0000001,
-0b0000110
+0b0110,
+0b1001,
+0b1001,
+0b0111,
+0b0001,
+0b0001,
+0b0110
 },
 {	// A
-0b0000110,
-0b0001001,
-0b0001001,
-0b0001111,
-0b0001001,
-0b0001001,
-0b0001001
+0b0110,
+0b1001,
+0b1001,
+0b1111,
+0b1001,
+0b1001,
+0b1001
 },
 {	// B
-0b0001110,
-0b0001001,
-0b0001001,
-0b0001110,
-0b0001001,
-0b0001001,
-0b0001110
+0b1110,
+0b1001,
+0b1001,
+0b1110,
+0b1001,
+0b1001,
+0b1110
 },
 {	// C
-0b0000111,
-0b0001000,
-0b0001000,
-0b0001000,
-0b0001000,
-0b0001000,
-0b0000111
+0b0111,
+0b1000,
+0b1000,
+0b1000,
+0b1000,
+0b1000,
+0b0111
 },
 {	// D
-0b0001110,
-0b0001001,
-0b0001001,
-0b0001001,
-0b0001001,
-0b0001001,
-0b0001110
+0b1110,
+0b1001,
+0b1001,
+0b1001,
+0b1001,
+0b1001,
+0b1110
 },
 {	// E
-0b0001111,
-0b0001000,
-0b0001000,
-0b0001111,
-0b0001000,
-0b0001000,
-0b0001111
+0b1111,
+0b1000,
+0b1000,
+0b1111,
+0b1000,
+0b1000,
+0b1111
 },
 {	// F
-0b0001111,
-0b0001000,
-0b0001000,
-0b0001110,
-0b0001000,
-0b0001000,
-0b0001000
+0b1111,
+0b1000,
+0b1000,
+0b1110,
+0b1000,
+0b1000,
+0b1000
 }
 };
 
+#if debug == 1
 void print_dot(uint8_t row) {
 
 	int i;
-	printf("%x", row);
+	printf("%2x", row);
 	for (i=7; i>=0; i--) {
 		if ((row >> i) & 0x01) {
 			printf("*");
@@ -221,6 +224,7 @@ void print_dot(uint8_t row) {
 	}
 	printf("\n");
 }
+#endif
 
 uint8_t mirror_5bit(uint8_t input) {
     uint8_t returnval = 0;
@@ -242,12 +246,21 @@ uint8_t mirror_5bit(uint8_t input) {
  *  @brief
  * 		It displays uint8 as two hex digits. 
  * 		The font looks like TIL311.
+ * 	@param
+ * 		data[in]			data to display
+ * 	@param
+ * 		hi_nibble_dp[in]	high nibble decimal point (0 off)
+ * 	@param
+ * 		low_nibble_dp[in]	low nibble decimal point (0 off)
+ * 	@param
+ * 		position[in]		position: 0 right, 1 middle, 2 left
  *
  *  @return
  *      int		error number: -1 wiringPi, -2 parameter
  */
 /* ===================================================================*/
-int write_hex_digits(uint8_t data, uint8_t decimal_point, uint8_t position) {
+int write_hex_digits(uint8_t data, uint8_t hi_nibble_dp, 
+				     uint8_t low_nibble_dp, uint8_t position) {
 
 int fd;
 uint8_t matrix[2][8];
@@ -255,31 +268,42 @@ int c;
 int row;
 int column;
 uint8_t font_x_y[7];
+uint8_t low_dp = 0;
+uint8_t hi_dp = 0;
 
 if (position < 3) {
 	fd = wiringPiI2CSetup(DRIVER_BASE + position);
 	if (fd < 0) {
-		printf("can not open i2c\n");
 		return (-1);
 	}
 } else {
-	printf("position has to be 0..2)\n");
 	return (-2);
 }
 
+if (low_nibble_dp) {
+	low_dp = 0x80;
+}
+
+if (hi_nibble_dp) {
+	hi_dp = 0xFF;
+}
 
 wiringPiI2CWriteReg8 (fd, CONFIGURATION_REGISTER, MATRIX1_AND_MATRIX2 | DOT_MATRIX_8x8) ;
 
-// lower nibble
+// low nibble
 c = data & 0x0F;
 for (row=0; row<7; row++) {	
+#if debug == 1	
 	print_dot(font_til311[c][row]);
-    wiringPiI2CWriteReg8 (fd, MATRIX_1_DATA_REGISTER+row, (mirror_5bit(font_til311[c][row]) >> 1) | 0x80);
+#endif
+    wiringPiI2CWriteReg8 (fd, MATRIX_1_DATA_REGISTER+row, (mirror_5bit(font_til311[c][row]) >> 1) | low_dp);
 }
 
+#if debug == 1
 printf("\n");
+#endif
 
-// higher nibble
+// high nibble
 c = data >> 4;
 for (column=0; column<7; column++) {
 	font_x_y[column] = 0;	
@@ -290,13 +314,16 @@ for (column=0; column<7; column++) {
 	}
 }
 for (row=0; row<7; row++) {	
+#if debug == 1
 	print_dot(font_x_y[row]);
+#endif
 	wiringPiI2CWriteReg8 (fd, MATRIX_2_DATA_REGISTER+row, font_x_y[row]);
 }
-wiringPiI2CWriteReg8 (fd, MATRIX_2_DATA_REGISTER+7, 0xFF);
+wiringPiI2CWriteReg8 (fd, MATRIX_2_DATA_REGISTER+7, hi_dp);
 
+#if debug == 1
 printf("\n");
-
+#endif
 
 wiringPiI2CWriteReg8 (fd, UPDATE_COLUMN_REGISTER, 0) ;
 
@@ -304,9 +331,3 @@ wiringPiI2CWriteReg8 (fd, UPDATE_COLUMN_REGISTER, 0) ;
 }
 
 
-int main() {
-	write_hex_digits(0x12, 0, 0);
-	write_hex_digits(0x34, 0, 1);
-	write_hex_digits(0x56, 0, 2);	
-	while(1) {};
-}

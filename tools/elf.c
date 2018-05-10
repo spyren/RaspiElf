@@ -51,7 +51,7 @@
  *   		verbose, output looks like 
  * 			LED:01 Q:1 Rx:1 IN:0 WAIT:1 CLR:1 READ:0 SWITCH:0c
  *  @file
- *      bin2elf.c
+ *      elf.c
  *  @author
  *      Peter Schmid, peter@spyr.ch
  *  @date
