@@ -183,7 +183,64 @@ int init_port_mode(void) {
 
     return 0;
 }
+  
+ /*
+ ** ===================================================================
+ **  Method      :  init_port_read
+ */
+/**
+ *  @brief
+ *      Initialises the Raspi GPIO port read only mode (direction, pullups)
+ *  @return
+ *      int		error number -1 wiringPi, -2 any switch to ground
+ */
+/* ===================================================================*/
+int init_port_read(void) {
+    if (wiringPiSetupGpio() == -1) {
+        return -1;
+    }
     
+    // read mode
+    pinMode(WRITE_N, INPUT);
+    
+    // run
+    pinMode(WAIT_N, INPUT);
+    pinMode(CLEAR_N, INPUT);
+    	
+    // in 
+    pinMode(IN_N, INPUT);
+      
+    // all outputs (switches)
+    pinMode(OUTPUT_0, INPUT);
+    pinMode(OUTPUT_1, INPUT);
+    pinMode(OUTPUT_2, INPUT);
+    pinMode(OUTPUT_3, INPUT);
+    pinMode(OUTPUT_4, INPUT);
+    pinMode(OUTPUT_5, INPUT);
+    pinMode(OUTPUT_6, INPUT);
+    pinMode(OUTPUT_7, INPUT);
+	    
+	// all inputs (LED)
+    pinMode(INPUT_0, INPUT);
+    pinMode(INPUT_1, INPUT);
+    pinMode(INPUT_2, INPUT);
+    pinMode(INPUT_3, INPUT);
+    pinMode(INPUT_4, INPUT);
+    pinMode(INPUT_5, INPUT);
+    pinMode(INPUT_6, INPUT);
+    pinMode(INPUT_7, INPUT);
+    // input pins have pull ups
+    pullUpDnControl (INPUT_0, PUD_UP) ;
+    pullUpDnControl (INPUT_1, PUD_UP) ;
+    pullUpDnControl (INPUT_2, PUD_UP) ;
+    pullUpDnControl (INPUT_3, PUD_UP) ;
+    pullUpDnControl (INPUT_4, PUD_UP) ;
+    pullUpDnControl (INPUT_5, PUD_UP) ;
+    pullUpDnControl (INPUT_6, PUD_UP) ;
+    pullUpDnControl (INPUT_7, PUD_UP) ;
+
+    return 0;
+}  
     
 /*
  ** ===================================================================

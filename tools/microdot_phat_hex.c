@@ -262,71 +262,74 @@ uint8_t mirror_5bit(uint8_t input) {
 int write_hex_digits(uint8_t data, uint8_t hi_nibble_dp, 
 				     uint8_t low_nibble_dp, uint8_t position) {
 
-int fd;
-uint8_t matrix[2][8];
-int c;
-int row;
-int column;
-uint8_t font_x_y[7];
-uint8_t low_dp = 0;
-uint8_t hi_dp = 0;
+	int fd;
+	uint8_t matrix[2][8];
+	int c;
+	int row;
+	int column;
+	uint8_t font_x_y[7];
+	uint8_t low_dp = 0;
+	uint8_t hi_dp = 0;
 
-if (position < 3) {
-	fd = wiringPiI2CSetup(DRIVER_BASE + position);
-	if (fd < 0) {
-		return (-1);
+	if (position < 3) {
+		fd = wiringPiI2CSetup(DRIVER_BASE + position);
+		if (fd < 0) {
+			return (-1);
+		}
+	} else {
+		return (-2);
 	}
-} else {
-	return (-2);
-}
 
-if (low_nibble_dp) {
-	low_dp = 0x80;
-}
+	if (low_nibble_dp) {
+		low_dp = 0x80;
+	}
 
-if (hi_nibble_dp) {
-	hi_dp = 0xFF;
-}
+	if (hi_nibble_dp) {
+		hi_dp = 0xFF;
+	}
 
-wiringPiI2CWriteReg8 (fd, CONFIGURATION_REGISTER, MATRIX1_AND_MATRIX2 | DOT_MATRIX_8x8) ;
+	wiringPiI2CWriteReg8 (fd, CONFIGURATION_REGISTER, MATRIX1_AND_MATRIX2 | DOT_MATRIX_8x8) ;
 
-// low nibble
-c = data & 0x0F;
-for (row=0; row<7; row++) {	
+	// low nibble
+	c = data & 0x0F;
+	for (row=0; row<7; row++) {	
 #if debug == 1	
-	print_dot(font_til311[c][row]);
+		print_dot(font_til311[c][row]);
 #endif
-    wiringPiI2CWriteReg8 (fd, MATRIX_1_DATA_REGISTER+row, (mirror_5bit(font_til311[c][row]) >> 1) | low_dp);
-}
-
-#if debug == 1
-printf("\n");
-#endif
-
-// high nibble
-c = data >> 4;
-for (column=0; column<7; column++) {
-	font_x_y[column] = 0;	
-	for (row=0; row<7; row++) {
-		if (font_til311[c][row] & (0x10 >> column)) {
-			font_x_y[column] |= (0x01 << row);
-		}	
+		wiringPiI2CWriteReg8 (fd, MATRIX_1_DATA_REGISTER+row, (mirror_5bit(font_til311[c][row]) >> 1) | low_dp);
 	}
-}
-for (row=0; row<7; row++) {	
-#if debug == 1
-	print_dot(font_x_y[row]);
-#endif
-	wiringPiI2CWriteReg8 (fd, MATRIX_2_DATA_REGISTER+row, font_x_y[row]);
-}
-wiringPiI2CWriteReg8 (fd, MATRIX_2_DATA_REGISTER+7, hi_dp);
+
+	close(fd);
 
 #if debug == 1
-printf("\n");
+	printf("\n");
 #endif
 
-wiringPiI2CWriteReg8 (fd, UPDATE_COLUMN_REGISTER, 0) ;
+	// high nibble
+	c = data >> 4;
+	for (column=0; column<7; column++) {
+		font_x_y[column] = 0;	
+		for (row=0; row<7; row++) {
+			if (font_til311[c][row] & (0x10 >> column)) {
+				font_x_y[column] |= (0x01 << row);
+			}	
+		}
+	}
+	for (row=0; row<7; row++) {	
+#if debug == 1
+		print_dot(font_x_y[row]);
+#endif
+		wiringPiI2CWriteReg8 (fd, MATRIX_2_DATA_REGISTER+row, font_x_y[row]);
+	}
+	wiringPiI2CWriteReg8 (fd, MATRIX_2_DATA_REGISTER+7, hi_dp);
 
+#if debug == 1
+	printf("\n");
+#endif
+
+	wiringPiI2CWriteReg8 (fd, UPDATE_COLUMN_REGISTER, 0) ;
+
+	close(fd);
 
 }
 

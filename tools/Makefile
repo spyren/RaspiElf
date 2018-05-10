@@ -39,8 +39,8 @@ raspi_gpio.o: raspi_gpio.c raspi_gpio.h
 microdot_phat_hex.o: microdot_phat_hex.c microdot_phat_hex.h
 	cc -g -c microdot_phat_hex.c
 	
-install: elf2bin bin2elf elf
-	install -m 557 elf2bin bin2elf elf /usr/local/bin
+install: elf2bin bin2elf elf elfdisplay
+	install -m 557 elf2bin bin2elf elf elfdisplay /usr/local/bin
 
 docs:
 	doxygen ./Doxyfile

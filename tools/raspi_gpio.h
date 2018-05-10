@@ -87,6 +87,18 @@ int init_port_level(void);
 /* ===================================================================*/
 int init_port_mode(void);
 
+/*
+ ** ===================================================================
+ **  Method      :  init_port_read
+ */
+/**
+ *  @brief
+ *      Initialises the Raspi GPIO port read only mode (direction, pullups)
+ *  @return
+ *      int		error number -1 wiringPi, -2 any switch to ground
+ */
+/* ===================================================================*/
+int init_port_read(void);
 
 /*
  ** ===================================================================
