@@ -51,118 +51,118 @@
 
 
 int main(int argc, char *argv[]) {
-    int i;
-    int opt;
-    int data;
-    uint8_t run_mode = FALSE;
-    uint8_t write_mode = FALSE;
-    uint16_t start_adr = START_ADR;
-    uint16_t end_adr = END_ADR;
-    FILE *fp;
+  int i;
+  int opt;
+  int data;
+  uint8_t run_mode = FALSE;
+  uint8_t write_mode = FALSE;
+  uint16_t start_adr = START_ADR;
+  uint16_t end_adr = END_ADR;
+  FILE *fp;
     
-    // parse command line options
-    while ((opt = getopt(argc, argv, "s:e:wr")) != -1) {
-        switch (opt) {
-            case 's': 
-                start_adr = strtol(optarg, NULL, 16);
-                break; 
-            case 'e': 
-                end_adr = strtol(optarg, NULL, 16);
-                break;
-            case 'w':
-				write_mode = TRUE;
-				break;
-            case 'r':
-				run_mode = TRUE;
-				break;
-            default:
-                fprintf(stderr, 
-                  "Usage: %s [-s <adr>] [-e <adr>] [-w] [-r] [<filename>]\n", 
-                  argv[0]);
-                exit(EXIT_FAILURE);
-        }
+  // parse command line options
+  while ((opt = getopt(argc, argv, "s:e:wr")) != -1) {
+    switch (opt) {
+    case 's': 
+      start_adr = strtol(optarg, NULL, 16);
+      break; 
+    case 'e': 
+      end_adr = strtol(optarg, NULL, 16);
+      break;
+    case 'w':
+      write_mode = TRUE;
+      break;
+    case 'r':
+      run_mode = TRUE;
+      break;
+    default:
+      fprintf(stderr, 
+	      "Usage: %s [-s <adr>] [-e <adr>] [-w] [-r] [<filename>]\n", 
+	      argv[0]);
+      exit(EXIT_FAILURE);
     }
+  }
 
-    fp = stdin;
-    if (optind < argc) {
-		// there is a filename parameter, use it instead of stdin
-		fp = fopen(argv[optind], "r");
-		if (fp == NULL) {
-			fprintf(stderr, 
-			  "Cannot open file \"%s\"\n", 
-			  argv[optind]);
-			exit(EXIT_FAILURE);
-		}
-	}
-    
-    if (init_port_mode() != 0) {
-        // can't init ports
-        exit(EXIT_FAILURE);
+  fp = stdin;
+  if (optind < argc) {
+    // there is a filename parameter, use it instead of stdin
+    fp = fopen(argv[optind], "r");
+    if (fp == NULL) {
+      fprintf(stderr, 
+	      "Cannot open file \"%s\"\n", 
+	      argv[optind]);
+      exit(EXIT_FAILURE);
     }
+  }
+    
+  if (init_port_mode() != 0) {
+    // can't init ports
+    exit(EXIT_FAILURE);
+  }
 
-    if (init_port_level() != 0) {
-        // can't init ports
-        exit(EXIT_FAILURE);
-    }
+  if (init_port_level() != 0) {
+    // can't init ports
+    exit(EXIT_FAILURE);
+  }
 
-	// load
-	digitalWrite(WAIT_N, 0);
-	digitalWrite(CLEAR_N, 0);
-    usleep(100);
-	// reset
-	digitalWrite(WAIT_N, 1);
-    usleep(100);
-	digitalWrite(WAIT_N, 0);
-    usleep(100);
+  // load
+  digitalWrite(WAIT_N, 0);
+  digitalWrite(CLEAR_N, 0);
+  usleep(100);
+  // reset
+  digitalWrite(WAIT_N, 1);
+  usleep(100);
+  digitalWrite(WAIT_N, 0);
+  usleep(100);
     
-    // read
-    digitalWrite(WRITE_N, 1);
-    for (i = 0; i < start_adr; i++) {
-        // count up to the start address
-        digitalWrite(IN_N, 0);
-        usleep(100);
-        digitalWrite(IN_N, 1);        
-        usleep(100);
+  // read
+  digitalWrite(WRITE_N, 1);
+  for (i = 0; i < start_adr; i++) {
+    // count up to the start address
+    digitalWrite(IN_N, 0);
+    usleep(100);
+    digitalWrite(IN_N, 1);        
+    usleep(100);
+  }
+    
+  // write enable
+  digitalWrite(WRITE_N, 0);
+   
+  int j = 0;
+  while ((data = fgetc(fp)) != EOF) {
+    write_byte(data);
+    j++;
+        
+    // in clock
+    digitalWrite(IN_N, 0);
+    usleep(100);
+    digitalWrite(IN_N, 1);
+    usleep(100);
+  
+    if (++i > end_adr) {
+      break;
     }
+  }
     
+  if (write_mode) {
     // write enable
     digitalWrite(WRITE_N, 0);
-   
-    int j = 0;
-    while ((data = fgetc(fp)) != EOF) {
-		write_byte(data);
-		j++;
-        
-        // in clock
-        digitalWrite(IN_N, 0);
-        usleep(100);
-        digitalWrite(IN_N, 1);
-        usleep(100);
-  
-        if (++i > end_adr) {
-            break;
-        }
-    }
-    
-    if (write_mode) {
-		// write enable
-		digitalWrite(WRITE_N, 0);
-	} else {
-		// read (disable write)
-		digitalWrite(WRITE_N, 1);
-	}
+  } else {
+    // read (disable write)
+    digitalWrite(WRITE_N, 1);
+  }
 	
-	if (run_mode) {
-		// run  
-		digitalWrite(WAIT_N, 1);
-		// reset
-		usleep(100);
-		digitalWrite(CLEAR_N, 1);    
-	}
+  if (run_mode) {
+    // run  
+    digitalWrite(WAIT_N, 1);
+    // reset
+    usleep(100);
+    digitalWrite(CLEAR_N, 1);    
+  }
     
-    fprintf(stderr, "0x%04x bytes written\n", j);
+  fprintf(stderr, "0x%04x bytes written\n", j);
     
-    fclose(fp);
+  fclose(fp);
 }
 
 

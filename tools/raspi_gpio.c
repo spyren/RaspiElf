@@ -2,7 +2,7 @@
  *  @brief
  *      Interface to the Elf Membership Card.
  * 
- * 		The wiringPi library is used to control the GPIOs. 
+ *      The wiringPi library is used to control the GPIOs. 
  *
  *  @file
  *      raspi_gpio.c
@@ -17,18 +17,18 @@
  *
  *      This file is part of "RaspiElf" software.
  *
- *		"RaspiElf" software is free software: you can redistribute it
- *		and/or modify it under the terms of the GNU General Public License as
- *		published by the Free Software Foundation, either version 3 of the
- *		License, or (at your option) any later version.
+ *      "RaspiElf" software is free software: you can redistribute it
+ *      and/or modify it under the terms of the GNU General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
  *
- *		"RaspiElf" is distributed in the hope that it will be useful,
- *		but WITHOUT ANY WARRANTY; without even the implied warranty of
- *		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *		GNU General Public License for more details.
+ *      "RaspiElf" is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU General Public License for more details.
  *
- *		You should have received a copy of the GNU General Public License along
- *		with "RaspiElf". If not, see <http://www.gnu.org/licenses/>.
+ *      You should have received a copy of the GNU General Public License along
+ *      with "RaspiElf". If not, see <http://www.gnu.org/licenses/>.
  */
 
 
@@ -48,82 +48,82 @@
  *  @brief
  *      Initialises the Raspi GPIO port level
  *  @return
- *      int		error number -1 wiringPi, -2 any switch to ground
+ *      int	error number -1 wiringPi, -2 any switch to ground
  */
 /* ===================================================================*/
 int init_port_level(void) {
 
-    // write mode
-    digitalWrite(WRITE_N, 0);
+  // write mode
+  digitalWrite(WRITE_N, 0);
     
-    // run
-    digitalWrite(WAIT_N, 1);
-    digitalWrite(CLEAR_N, 1);
+  // run
+  digitalWrite(WAIT_N, 1);
+  digitalWrite(CLEAR_N, 1);
     
-    // in disable
-    digitalWrite(IN_N, 1);
+  // in disable
+  digitalWrite(IN_N, 1);
 
-    if (!digitalRead(WAIT_N) || 
-		!digitalRead(CLEAR_N) || !digitalRead(IN_N)) {
-		// any of the mode pins is low -> switch in wrong position
-		pinMode(WRITE_N, INPUT);
-		pinMode(WAIT_N, INPUT);
-		pinMode(CLEAR_N, INPUT);
-		return -2;
-	}
+  if (!digitalRead(WAIT_N) || 
+      !digitalRead(CLEAR_N) || !digitalRead(IN_N)) {
+    // any of the mode pins is low -> switch in wrong position
+    pinMode(WRITE_N, INPUT);
+    pinMode(WAIT_N, INPUT);
+    pinMode(CLEAR_N, INPUT);
+    return -2;
+  }
 	 
-    // reset
-    digitalWrite(CLEAR_N, 0);
+  // reset
+  digitalWrite(CLEAR_N, 0);
     
-    // load
-    digitalWrite(WAIT_N, 0);
+  // load
+  digitalWrite(WAIT_N, 0);
     
-    // all outputs are high
-    pinMode(OUTPUT_0, OUTPUT);
-    pinMode(OUTPUT_1, OUTPUT);
-    pinMode(OUTPUT_2, OUTPUT);
-    pinMode(OUTPUT_3, OUTPUT);
-    pinMode(OUTPUT_4, OUTPUT);
-    pinMode(OUTPUT_5, OUTPUT);
-    pinMode(OUTPUT_6, OUTPUT);
-    pinMode(OUTPUT_7, OUTPUT);
-    write_byte(0xFF);      
-    if (!digitalRead(OUTPUT_0) || !digitalRead(OUTPUT_1) || 
-		!digitalRead(OUTPUT_2) || !digitalRead(OUTPUT_3) || 
-		!digitalRead(OUTPUT_4) || !digitalRead(OUTPUT_5) ||
-		!digitalRead(OUTPUT_6) || !digitalRead(OUTPUT_7)) 
-	{
-		// any of the data out pins is low -> switch in wrong position
-		pinMode(OUTPUT_0, INPUT);
-		pinMode(OUTPUT_1, INPUT);
-		pinMode(OUTPUT_2, INPUT);
-		pinMode(OUTPUT_3, INPUT);
-		pinMode(OUTPUT_4, INPUT);
-		pinMode(OUTPUT_5, INPUT);
-		pinMode(OUTPUT_6, INPUT);
-		pinMode(OUTPUT_7, INPUT);
-		return -2;
-	}
+  // all outputs are high
+  pinMode(OUTPUT_0, OUTPUT);
+  pinMode(OUTPUT_1, OUTPUT);
+  pinMode(OUTPUT_2, OUTPUT);
+  pinMode(OUTPUT_3, OUTPUT);
+  pinMode(OUTPUT_4, OUTPUT);
+  pinMode(OUTPUT_5, OUTPUT);
+  pinMode(OUTPUT_6, OUTPUT);
+  pinMode(OUTPUT_7, OUTPUT);
+  write_byte(0xFF);      
+  if (!digitalRead(OUTPUT_0) || !digitalRead(OUTPUT_1) || 
+      !digitalRead(OUTPUT_2) || !digitalRead(OUTPUT_3) || 
+      !digitalRead(OUTPUT_4) || !digitalRead(OUTPUT_5) ||
+      !digitalRead(OUTPUT_6) || !digitalRead(OUTPUT_7)) 
+    {
+      // any of the data out pins is low -> switch in wrong position
+      pinMode(OUTPUT_0, INPUT);
+      pinMode(OUTPUT_1, INPUT);
+      pinMode(OUTPUT_2, INPUT);
+      pinMode(OUTPUT_3, INPUT);
+      pinMode(OUTPUT_4, INPUT);
+      pinMode(OUTPUT_5, INPUT);
+      pinMode(OUTPUT_6, INPUT);
+      pinMode(OUTPUT_7, INPUT);
+      return -2;
+    }
 	    
-    pinMode(INPUT_0, INPUT);
-    pinMode(INPUT_1, INPUT);
-    pinMode(INPUT_2, INPUT);
-    pinMode(INPUT_3, INPUT);
-    pinMode(INPUT_4, INPUT);
-    pinMode(INPUT_5, INPUT);
-    pinMode(INPUT_6, INPUT);
-    pinMode(INPUT_7, INPUT);
-    // input pins have pull ups
-    pullUpDnControl (INPUT_0, PUD_UP) ;
-    pullUpDnControl (INPUT_1, PUD_UP) ;
-    pullUpDnControl (INPUT_2, PUD_UP) ;
-    pullUpDnControl (INPUT_3, PUD_UP) ;
-    pullUpDnControl (INPUT_4, PUD_UP) ;
-    pullUpDnControl (INPUT_5, PUD_UP) ;
-    pullUpDnControl (INPUT_6, PUD_UP) ;
-    pullUpDnControl (INPUT_7, PUD_UP) ;
+  pinMode(INPUT_0, INPUT);
+  pinMode(INPUT_1, INPUT);
+  pinMode(INPUT_2, INPUT);
+  pinMode(INPUT_3, INPUT);
+  pinMode(INPUT_4, INPUT);
+  pinMode(INPUT_5, INPUT);
+  pinMode(INPUT_6, INPUT);
+  pinMode(INPUT_7, INPUT);
+  // input pins have pull ups
+  pullUpDnControl (INPUT_0, PUD_UP) ;
+  pullUpDnControl (INPUT_1, PUD_UP) ;
+  pullUpDnControl (INPUT_2, PUD_UP) ;
+  pullUpDnControl (INPUT_3, PUD_UP) ;
+  pullUpDnControl (INPUT_4, PUD_UP) ;
+  pullUpDnControl (INPUT_5, PUD_UP) ;
+  pullUpDnControl (INPUT_6, PUD_UP) ;
+  pullUpDnControl (INPUT_7, PUD_UP) ;
 
-    return 0;
+  return 0;
 }
 
 /*

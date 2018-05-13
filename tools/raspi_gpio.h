@@ -15,18 +15,18 @@
  *
  *      This file is part of "RaspiElf" software.
  *
- *		"RaspiElf" software is free software: you can redistribute it
- *		and/or modify it under the terms of the GNU General Public License as
- *		published by the Free Software Foundation, either version 3 of the
- *		License, or (at your option) any later version.
+ *	"RaspiElf" software is free software: you can redistribute it
+ *      and/or modify it under the terms of the GNU General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
  *
- *		"RaspiElf" is distributed in the hope that it will be useful,
- *		but WITHOUT ANY WARRANTY; without even the implied warranty of
- *		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *		GNU General Public License for more details.
+ *      "RaspiElf" is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU General Public License for more details.
  *
- *		You should have received a copy of the GNU General Public License along
- *		with "RaspiElf". If not, see <http://www.gnu.org/licenses/>.
+ *      You should have received a copy of the GNU General Public License along
+ *      with "RaspiElf". If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef RASPI_GPIO_H_
@@ -53,8 +53,8 @@
 #define INPUT_5     19
 #define INPUT_6     16
 #define INPUT_7     26
-#define RX_Q		15
-#define TX_EF3		14
+#define RX_Q	    15
+#define TX_EF3	    14
 
 // default start and end address
 #define START_ADR   0x0000
@@ -69,7 +69,7 @@
  *  @brief
  *      Initialises the Raspi GPIO port level
  *  @return
- *      int		error number -1 wiringPi, -2 any switch to ground
+ *      int	error number -1 wiringPi, -2 any switch to ground
  */
 /* ===================================================================*/
 int init_port_level(void);
@@ -82,7 +82,7 @@ int init_port_level(void);
  *  @brief
  *      Initialises the Raspi GPIO port mode (direction, pullups)
  *  @return
- *      int		error number -1 wiringPi, -2 any switch to ground
+ *      int	error number -1 wiringPi, -2 any switch to ground
  */
 /* ===================================================================*/
 int init_port_mode(void);
@@ -95,7 +95,7 @@ int init_port_mode(void);
  *  @brief
  *      Initialises the Raspi GPIO port read only mode (direction, pullups)
  *  @return
- *      int		error number -1 wiringPi, -2 any switch to ground
+ *      int     error number -1 wiringPi, -2 any switch to ground
  */
 /* ===================================================================*/
 int init_port_read(void);
