@@ -64,177 +64,177 @@
 
   
 const uint8_t font_til311[16][7]={
-{   // 0 
-0b0110,
-0b1001,
-0b1001,
-0b1001,
-0b1001,
-0b1001,
-0b0110
-},
-{   // 1
-0b0001,
-0b0001,
-0b0001,
-0b0001,
-0b0001,
-0b0001,
-0b0001
-},
-{   // 2 
-0b1110,
-0b0001,
-0b0001,
-0b0110,
-0b1000,
-0b1000,
-0b1111
-},
-{   // 3 
-0b1110,
-0b0001,
-0b0001,
-0b0110,
-0b0001,
-0b0001,
-0b1110
-},
-{   // 4 
-0b1000,
-0b1001,
-0b1001,
-0b1111,
-0b0001,
-0b0001,
-0b0001
-},
-{   // 5
-0b1111,
-0b1000,
-0b1000,
-0b1110,
-0b0001,
-0b0001,
-0b1110
-},
-{   // 6 
-0b0110,
-0b1000,
-0b1000,
-0b1110,
-0b1001,
-0b1001,
-0b0110
-},
-{   // 7
-0b1111,
-0b0001,
-0b0001,
-0b0001,
-0b0001,
-0b0001,
-0b0001
-},
-{   // 8
-0b0110,
-0b1001,
-0b1001,
-0b0110,
-0b1001,
-0b1001,
-0b0110
-},
-{   // 9
-0b0110,
-0b1001,
-0b1001,
-0b0111,
-0b0001,
-0b0001,
-0b0110
-},
-{   // A
-0b0110,
-0b1001,
-0b1001,
-0b1111,
-0b1001,
-0b1001,
-0b1001
-},
-{   // B
-0b1110,
-0b1001,
-0b1001,
-0b1110,
-0b1001,
-0b1001,
-0b1110
-},
-{   // C
-0b0111,
-0b1000,
-0b1000,
-0b1000,
-0b1000,
-0b1000,
-0b0111
-},
-{   // D
-0b1110,
-0b1001,
-0b1001,
-0b1001,
-0b1001,
-0b1001,
-0b1110
-},
-{   // E
-0b1111,
-0b1000,
-0b1000,
-0b1111,
-0b1000,
-0b1000,
-0b1111
-},
-{   // F
-0b1111,
-0b1000,
-0b1000,
-0b1110,
-0b1000,
-0b1000,
-0b1000
-}
+  {   // 0 
+    0b0110,
+    0b1001,
+    0b1001,
+    0b1001,
+    0b1001,
+    0b1001,
+    0b0110
+  },
+  {   // 1
+    0b0001,
+    0b0001,
+    0b0001,
+    0b0001,
+    0b0001,
+    0b0001,
+    0b0001
+  },
+  {   // 2 
+    0b1110,
+    0b0001,
+    0b0001,
+    0b0110,
+    0b1000,
+    0b1000,
+    0b1111
+  },
+  {   // 3 
+    0b1110,
+    0b0001,
+    0b0001,
+    0b0110,
+    0b0001,
+    0b0001,
+    0b1110
+  },
+  {   // 4 
+    0b1000,
+    0b1001,
+    0b1001,
+    0b1111,
+    0b0001,
+    0b0001,
+    0b0001
+  },
+  {   // 5
+    0b1111,
+    0b1000,
+    0b1000,
+    0b1110,
+    0b0001,
+    0b0001,
+    0b1110
+  },
+  {   // 6 
+    0b0110,
+    0b1000,
+    0b1000,
+    0b1110,
+    0b1001,
+    0b1001,
+    0b0110
+  },
+  {   // 7
+    0b1111,
+    0b0001,
+    0b0001,
+    0b0001,
+    0b0001,
+    0b0001,
+    0b0001
+  },
+  {   // 8
+    0b0110,
+    0b1001,
+    0b1001,
+    0b0110,
+    0b1001,
+    0b1001,
+    0b0110
+  },
+  {   // 9
+    0b0110,
+    0b1001,
+    0b1001,
+    0b0111,
+    0b0001,
+    0b0001,
+    0b0110
+  },
+  {   // A
+    0b0110,
+    0b1001,
+    0b1001,
+    0b1111,
+    0b1001,
+    0b1001,
+    0b1001
+  },
+  {   // B
+    0b1110,
+    0b1001,
+    0b1001,
+    0b1110,
+    0b1001,
+    0b1001,
+    0b1110
+  },
+  {   // C
+    0b0111,
+    0b1000,
+    0b1000,
+    0b1000,
+    0b1000,
+    0b1000,
+    0b0111
+  },
+  {   // D
+    0b1110,
+    0b1001,
+    0b1001,
+    0b1001,
+    0b1001,
+    0b1001,
+    0b1110
+  },
+  {   // E
+    0b1111,
+    0b1000,
+    0b1000,
+    0b1111,
+    0b1000,
+    0b1000,
+    0b1111
+  },
+  {   // F
+    0b1111,
+    0b1000,
+    0b1000,
+    0b1110,
+    0b1000,
+    0b1000,
+    0b1000
+  }
 };
 
 #if debug == 1
 void print_dot(uint8_t row) {
 
-    int i;
-    printf("%2x", row);
-    for (i=7; i>=0; i--) {
-        if ((row >> i) & 0x01) {
-            printf("*");
-        } else {
-            printf("-");
-        }
+  int i;
+  printf("%2x", row);
+  for (i=7; i>=0; i--) {
+    if ((row >> i) & 0x01) {
+      printf("*");
+    } else {
+      printf("-");
     }
-    printf("\n");
+  }
+  printf("\n");
 }
 #endif
 
 uint8_t mirror_5bit(uint8_t input) {
-    uint8_t returnval = 0;
-    int i;
-    for (i = 0; i < 5; ++i) {
-        returnval |= (input & 0x01);
-        input >>= 1;
-        returnval <<= 1;
-    }
-    return returnval;
+  uint8_t returnval = 0;
+  int i;
+  for (i = 0; i < 5; ++i) {
+    returnval |= (input & 0x01);
+    input >>= 1;
+    returnval <<= 1;
+  }
+  return returnval;
 }
 
 
@@ -262,75 +262,77 @@ uint8_t mirror_5bit(uint8_t input) {
 int write_hex_digits(uint8_t data, uint8_t hi_nibble_dp, 
                      uint8_t low_nibble_dp, uint8_t position) {
 
-    int fd;
-    uint8_t matrix[2][8];
-    int c;
-    int row;
-    int column;
-    uint8_t font_x_y[7];
-    uint8_t low_dp = 0;
-    uint8_t hi_dp = 0;
+  int fd;
+  uint8_t matrix[2][8];
+  int c;
+  int row;
+  int column;
+  uint8_t font_x_y[7];
+  uint8_t low_dp = 0;
+  uint8_t hi_dp = 0;
 
-    if (position < 3) {
-        fd = wiringPiI2CSetup(DRIVER_BASE + position);
-        if (fd < 0) {
-            return (-1);
-        }
-    } else {
-        return (-2);
+  if (position >= 0 && position < 3) {
+    fd = wiringPiI2CSetup(DRIVER_BASE + position);
+    if (fd < 0) {
+      // can't open I2C device
+      return (-1);
     }
+  } else {
+    // invalid position
+    return (-2);
+  }
 
-    if (low_nibble_dp) {
-        low_dp = 0x80;
-    }
+  if (low_nibble_dp) {
+    // notice low nibble decimal point
+    low_dp = 0x80;
+  }
 
-    if (hi_nibble_dp) {
-        hi_dp = 0xFF;
-    }
+  if (hi_nibble_dp) {
+    // notice high nibble decimal point
+    hi_dp = 0xFF;
+  }
 
-    wiringPiI2CWriteReg8 (fd, CONFIGURATION_REGISTER, MATRIX1_AND_MATRIX2 | DOT_MATRIX_8x8) ;
+  wiringPiI2CWriteReg8 (fd, RESET_REGISTER, 0) ;
+  wiringPiI2CWriteReg8 (fd, CONFIGURATION_REGISTER, MATRIX1_AND_MATRIX2 | DOT_MATRIX_8x8) ;
 
-    // low nibble
-    c = data & 0x0F;
-    for (row=0; row<7; row++) { 
+  // low nibble
+  c = data & 0x0F;
+  for (row=0; row<7; row++) { 
 #if debug == 1  
-        print_dot(font_til311[c][row]);
+    print_dot(font_til311[c][row]);
 #endif
-        wiringPiI2CWriteReg8 (fd, MATRIX_1_DATA_REGISTER+row, (mirror_5bit(font_til311[c][row]) >> 1) | low_dp);
-    }
-
-    close(fd);
+    wiringPiI2CWriteReg8 (fd, MATRIX_1_DATA_REGISTER+row, (mirror_5bit(font_til311[c][row]) >> 1) | low_dp);
+  }
 
 #if debug == 1
-    printf("\n");
+  printf("\n");
 #endif
 
-    // high nibble
-    c = data >> 4;
-    for (column=0; column<7; column++) {
-        font_x_y[column] = 0;   
-        for (row=0; row<7; row++) {
-            if (font_til311[c][row] & (0x10 >> column)) {
-                font_x_y[column] |= (0x01 << row);
-            }   
-        }
+  // high nibble
+  c = data >> 4;
+  for (column=0; column<7; column++) {
+    font_x_y[column] = 0;   
+    for (row=0; row<7; row++) {
+      if (font_til311[c][row] & (0x10 >> column)) {
+	font_x_y[column] |= (0x01 << row);
+      }   
     }
-    for (row=0; row<7; row++) { 
+  }
+  for (row=0; row<7; row++) { 
 #if debug == 1
-        print_dot(font_x_y[row]);
+    print_dot(font_x_y[row]);
 #endif
-        wiringPiI2CWriteReg8 (fd, MATRIX_2_DATA_REGISTER+row, font_x_y[row]);
-    }
-    wiringPiI2CWriteReg8 (fd, MATRIX_2_DATA_REGISTER+7, hi_dp);
+    wiringPiI2CWriteReg8 (fd, MATRIX_2_DATA_REGISTER+row, font_x_y[row]);
+  }
+  wiringPiI2CWriteReg8 (fd, MATRIX_2_DATA_REGISTER+7, hi_dp);
 
 #if debug == 1
-    printf("\n");
+  printf("\n");
 #endif
 
-    wiringPiI2CWriteReg8 (fd, UPDATE_COLUMN_REGISTER, 0) ;
+  wiringPiI2CWriteReg8 (fd, UPDATE_COLUMN_REGISTER, 0) ;
 
-    close(fd);
-
+  close(fd);
 }
 
 
