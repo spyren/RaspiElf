@@ -1,55 +1,55 @@
 /**
  *  @brief
  *      Controls the mode, sets data switches and gets LED data of an 
- * 		Elf (Membership Card).
+ * 	Elf (Membership Card).
  * 
  *      The Raspberry Pi GPIO is used as interface to the Cosmac Elf SBC 
- * 		(e.g. Elf Membership Card parallel port). If a command is 
- * 		missing, the default command is then get. All switches an the 
- * 		Elf Membership Card have to be on the up position except for the 
- * 		READ switch, the READ switch has to be on the down position.
+ *      e.g. Elf Membership Card parallel port). If a command is 
+ *      missing, the default command is then get. All switches an the 
+ *      Elf Membership Card have to be on the up position except for the 
+ *      READ switch, the READ switch has to be on the down position.
  *
  *   	synopsis
- *		 $ elf [-i] [-v] [-s <number>] [load|run|wait|reset|write|get|put] [<switch>] 
+ *       $ elf [-i] [-v] [-s <number>] [load|run|wait|reset|write|get|put] [<switch>] 
  * 
- *		load
- *		    sets the mode to load (WAIT and CLR active, is equivalent to 
- * 			switches down) 
- *		run
- *		    sets the mode to run (WAIT and CLR inactive, is equivalent 
- * 			to switches up) 
- *		wait
- * 			sets the WAIT to active (is equivalent to switch down), 
- * 			option -n inverts the WAIT to inactive (is equivalent to 
- * 			switch down) 
- *		reset|clear
- * 			sets the CLR to active (is equivalent to switch down), 
- * 			option -n inverts the CLR to inactive (is equivalent to 
- * 			switch down) 
- *		read
- *			sets the WE to active (is equivalent to switch down), 
- * 			option -n inverts the CLR to inactive (is equivalent to 
- * 			switch down) 
- *		get
- *			gets the mode and the switch data and the LED data 
- *		put <switch>
- *		    puts the switch data to the data switches. The data is in 
- * 			hex. The Raspberry Pi GPIO is used as interface to the 
- * 			Cosmac Elf SBC (e.g. Elf Membership Card parallel port).
+ *	load
+ *          sets the mode to load (WAIT and CLR active, is equivalent to 
+ * 	    switches down) 
+ *      run
+ *          sets the mode to run (WAIT and CLR inactive, is equivalent 
+ *          to switches up) 
+ *      wait
+ *          sets the WAIT to active (is equivalent to switch down), 
+ *          option -n inverts the WAIT to inactive (is equivalent to 
+ *          switch down) 
+ *     reset|clear
+ *          sets the CLR to active (is equivalent to switch down), 
+ *          option -n inverts the CLR to inactive (is equivalent to 
+ *          switch down) 
+ *     read
+ *          sets the WE to active (is equivalent to switch down), 
+ *          option -n inverts the CLR to inactive (is equivalent to 
+ *          switch down) 
+ *     get
+ *          gets the mode and the switch data and the LED data 
+ *     put <switch>
+ *          puts the switch data to the data switches. The data is in 
+ *          hex. The Raspberry Pi GPIO is used as interface to the 
+ *          Cosmac Elf SBC (e.g. Elf Membership Card parallel port).
  * 
- *		without command parameter get is executed
+ *     without command parameter get is executed
  * 
- *		-s hexadr
- *   		start address in hex (0 is default). Pre increment to the 
- * 			start address before the data is read and written. 
- *		-i
- *   		post increment. The IN is set active for > 100 us after the 
- * 			data is read and written 
- *		-n
- *    		not, invert the command. No effect for load, run, get, and put. 
- *		-v
- *   		verbose, output looks like 
- * 			LED:01 Q:1 Rx:1 IN:0 WAIT:1 CLR:1 READ:0 SWITCH:0c
+ *     -s hexadr
+ *         start address in hex (0 is default). Pre increment to the 
+ *         start address before the data is read and written. 
+ *     -i
+ *         post increment. The IN is set active for > 100 us after the 
+ *         data is read and written 
+ *     -n
+ *         not, invert the command. No effect for load, run, get, and put. 
+ *     -v
+ *        verbose, output looks like 
+ *        LED:01 Q:1 Rx:1 IN:0 WAIT:1 CLR:1 READ:0 SWITCH:0c
  *  @file
  *      elf.c
  *  @author

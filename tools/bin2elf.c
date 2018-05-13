@@ -8,12 +8,12 @@
  *      http://spyr.ch/twiki/bin/view/Cosmac/RaspiElf
  *
  *   	synopsis
- *		 $ bin2elf [-s <hexadr>] [-e <hexadr>] [<filename>]
- * 		The file is read from stdin in or <filename>.
- * 		-s start address in hex
- * 		-e end adress in hex
- * 		-w write enable
- * 		-r run mode
+ *	$ bin2elf [-s <hexadr>] [-e <hexadr>] [<filename>]
+ * 	    The file is read from stdin in or <filename>.
+ * 	    -s start address in hex
+ * 	    -e end adress in hex
+ * 	    -w write enable
+ * 	    -r run mode
  *  @file
  *      bin2elf.c
  *  @author

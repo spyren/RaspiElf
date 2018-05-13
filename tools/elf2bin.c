@@ -8,15 +8,15 @@
  *      http://spyr.ch/twiki/bin/view/Cosmac/RaspiElf
  *
  *   	synopsis
- *		 $ elf2bin [-s <hexadr>] [-e <hexadr>] [-w] [-r] [<filename>]
- * 		The generated data is written to the standard output stream or to
- * 		<filename>. Caution: Overwrite file if it exists.  
- * 		Use  > for redirecting (save the file) or | for piping to 
- * 		another command (e.g. hexdump)
- * 		-s start address in hex
- * 		-e end adress in hex
- * 		-w read enable
- * 		-r run mode
+ *      $ elf2bin [-s <hexadr>] [-e <hexadr>] [-w] [-r] [<filename>]
+ *          The generated data is written to the standard output stream or to
+ *          <filename>. Caution: Overwrite file if it exists.  
+ *          Use  > for redirecting (save the file) or | for piping to 
+ *          another command (e.g. hexdump)
+ *          -s start address in hex
+ *          -e end adress in hex
+ *          -w read enable
+ *          -r run mode
  *  
  *  @file 
  *      elf2bin.c
