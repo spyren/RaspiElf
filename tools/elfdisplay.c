@@ -2,6 +2,12 @@
  *  @brief
  *      Reads a hex keypad and sets the data and gets LED data of an Elf (Membership Card) and 
  *      shows address and data on micro dot pHAT display.
+ *
+ *      The console (stdin) can be used as keyboard or the EV_KEY events from USB keypad 
+ *      (e.g. /dev/input/event0). 
+ *
+ *      Synopsis
+ *        $ elfdisplay [-v] [<device-filename>]
  * 
  *  @file
  *      elfdisplay.c
