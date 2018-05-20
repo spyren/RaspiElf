@@ -43,21 +43,27 @@
 #include "raspi_gpio.h"
 #include "microdot_phat_hex.h"
 
-typedef enum {LOAD_READ, LOAD_WRITE, RUN, WAIT, ADDRESS} elf_mode_t;
+typedef enum {LOAD, RUN, WAIT, ADDRESS, SWITCH} elf_mode_t;
 
+// local prototypes
 int getkey();
-
+void inc_elf();
+void reset_elf();
+void load_elf();
+void run_elf();
 
 int main(int argc, char *argv[]) {
   uint16_t adr = 0;
   uint8_t data = 0;
   elf_mode_t elf_mode;
-  uint8_t write_protect;
+  uint8_t memory_protect;
   int key;
   uint8_t hi_nibble = TRUE;
   uint8_t hi_byte = TRUE;
   uint8_t nibble;
   uint8_t hexin = 0;
+  uint8_t in;
+  uint8_t sw;
   int i;
   
   if (init_port_mode() != 0) {
@@ -78,36 +84,28 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "can't open I2C\n");
     exit(EXIT_FAILURE);
   }
-  if (write_hex_digits(0x18, 0, 0, 0) < 2) {
+  if (write_hex_digits(0x18, 0, 0, 2) < 0) {
     // can't open I2C
     fprintf(stderr, "can't open I2C\n");
     exit(EXIT_FAILURE);
   }
-  if (write_hex_digits(0x02, 0, 0, 0) < 1) {
+  if (write_hex_digits(0x02, 0, 0, 1) < 0) {
     // can't open I2C
     fprintf(stderr, "can't open I2C\n");
     exit(EXIT_FAILURE);
   }
     
   // load mode
-  digitalWrite(WAIT_N, 0);
-  digitalWrite(CLEAR_N, 0);
-  elf_mode = LOAD_READ;
-  usleep(100);
-  // reset
-  digitalWrite(WAIT_N, 1);
-  usleep(100);
-  digitalWrite(WAIT_N, 0);
-  usleep(100);
+  elf_mode = LOAD;
+  load_elf();
+  reset_elf();
     
   // read
   digitalWrite(WRITE_N, 1);
-  write_protect = TRUE;
+  memory_protect = TRUE;
 
   // get first byte
-  digitalWrite(IN_N, 0);
-  usleep(100);
-  digitalWrite(IN_N, 1); 
+  inc_elf();
   
   usleep(1000);
      
@@ -154,14 +152,17 @@ int main(int argc, char *argv[]) {
 	write_byte(data);
       }
     }
-        
+
+    in = read_byte();
+    sw = read_switches();
+    
     // simple statemachine
     switch (elf_mode) {
-    case LOAD_READ:
+    case LOAD:
       switch (key) {
       case EOF:
 	// no key pressed
-	write_hex_digits(read_byte(), TRUE, write_protect, 0);
+	write_hex_digits(memory_protect?in:data, TRUE, memory_protect, 0);
 	write_hex_digits(adr & 0x00FF, FALSE, FALSE, 1);
 	write_hex_digits(adr >> 8, TRUE, FALSE, 2);             
 	break;
@@ -170,28 +171,42 @@ int main(int argc, char *argv[]) {
 	// INPUT key
 	adr++;
 	hi_nibble = TRUE;
-	usleep(100);
-	digitalWrite(IN_N, 0);
-	usleep(100);
-	digitalWrite(IN_N, 1); 
+	inc_elf();
 	break; 
       case '-':
       case 'W':
-	// write enable for LOAD
-	elf_mode = LOAD_WRITE;
-	hi_nibble = TRUE;
-	write_protect = FALSE;
-	digitalWrite(WRITE_N, 0);
-	break;
-      case '+':
-      case 'R':
-	// RUN
-	elf_mode = RUN;
-	digitalWrite(WAIT_N, 1);
-	digitalWrite(CLEAR_N, 1);
+      case 'M':
+	// toggle memory_protect
+	if (memory_protect) {
+	  // disable memory protect (write)
+	  memory_protect = FALSE;	
+	  // set address
+	  reset_elf();
+	  // count up to adr
+	  for (i=0; i<adr; i++) {
+	    inc_elf();
+	  }
+	  digitalWrite(WRITE_N, 0);
+	} else {
+	  // memory protect for LOAD (read)
+	  memory_protect = TRUE;
+	  digitalWrite(WRITE_N, 1);
+	  // get first byte
+	  inc_elf(); 
+	}
 	hi_nibble = TRUE;
 	break;
       case '.':
+      case 'R':
+	// RUN
+	elf_mode = RUN;
+	hi_nibble = TRUE;
+	// default is write for RUN
+	memory_protect = FALSE;	
+	digitalWrite(WRITE_N, 0);
+	run_elf();
+	break;
+      case '+':
       case 'L':
 	// LOAD again -> read address
 	elf_mode = ADDRESS;
@@ -200,148 +215,95 @@ int main(int argc, char *argv[]) {
 	hexin = adr >> 8;
 	break;
       }
-        
-      break;
-    case LOAD_WRITE:
-      switch (key) {
-      case EOF:
-	write_hex_digits(read_switches(), TRUE, write_protect, 0);
-	write_hex_digits(adr & 0x00FF, FALSE, FALSE, 1);
-	write_hex_digits(adr >> 8, TRUE, FALSE, 2);             
-	break;
-      case '\n':
-      case 'I':
-	// INPUT
-	adr++;
-	usleep(100);
-	digitalWrite(IN_N, 0);
-	usleep(100);
-	digitalWrite(IN_N, 1); 
-	hi_nibble = TRUE;
-	break; 
-      case '-':
-      case 'W':
-	// write protect for LOAD
-	elf_mode = LOAD_READ;
-	write_protect = TRUE;
-	digitalWrite(WRITE_N, 1);
-	hi_nibble = TRUE;
-	break;
-      case '+':
-      case 'R':
-	// RUN
-	elf_mode = RUN;
-	digitalWrite(WAIT_N, 1);
-	digitalWrite(CLEAR_N, 1);
-	hi_nibble = TRUE;
-	break;
-      case '.':
-      case 'L':
-	// LOAD again -> read address
-	elf_mode = ADDRESS;
-	hi_nibble = TRUE;
-	hexin = adr >> 8;
-	break;
-      }
       break;
     case RUN:
       switch (key) {
       case EOF:
-	write_hex_digits(read_switches(), TRUE, write_protect, 0);
-	write_hex_digits(read_byte(), FALSE, FALSE, 1);
+	write_hex_digits(sw, TRUE, memory_protect, 0);
+	write_hex_digits(in, FALSE, FALSE, 1);
 	write_hex_digits(0, FALSE, TRUE, 2);
 	break;
       case '-':
       case 'W':
+      case 'M':
 	// Toggle write
-	if (write_protect) {
-	  write_protect = FALSE;
+	if (memory_protect) {
+	  memory_protect = FALSE;
 	  digitalWrite(WRITE_N, 0);
 	} else {
-	  write_protect = TRUE;
+	  memory_protect = TRUE;
 	  digitalWrite(WRITE_N, 1);
 	}
 	hi_nibble = TRUE;
 	break;
-      case '+':
+      case '.':
       case 'R':
 	// WAIT
 	digitalWrite(WAIT_N, 0);
 	elf_mode = WAIT;
 	hi_nibble = TRUE;
 	break;
-      case '.':
+      case '+':
       case 'L':
 	// LOAD mode
-	digitalWrite(WAIT_N, 0);
-	digitalWrite(CLEAR_N, 0);
-	elf_mode = LOAD_WRITE;
-	usleep(100);
-	// reset
-	digitalWrite(WAIT_N, 1);
-	usleep(100);
-	digitalWrite(WAIT_N, 0);
-	usleep(100);
+	load_elf();
+	reset_elf();
 	adr = 0;
-	if (write_protect) {
-	  elf_mode = LOAD_READ;
-	  // get first byte
-	  digitalWrite(IN_N, 0);
-	  usleep(100);
-	  digitalWrite(IN_N, 1); 
-	} else {
-	  elf_mode = LOAD_WRITE;
-	}
+	memory_protect = TRUE;
+	digitalWrite(WRITE_N, 1);
+	elf_mode = LOAD;
+	// get first byte
+	inc_elf();
 	hi_nibble = TRUE;
 	break;
+      case 0x08: // backspace
+      case 'K':
+      case 'S':
+	// SWITCH mode
+	// put the switch port to all 1s (the switches on EMC can override)
+	data = 0xFF;
+	// read (the switche on EMC can override)
+	digitalWrite(WRITE_N, 1);	
+	elf_mode = SWITCH;
       }
       break;
     case WAIT:
       switch (key) {
       case EOF:
-	write_hex_digits(read_switches(), TRUE, write_protect, 0);
-	write_hex_digits(read_byte(), TRUE, FALSE, 1);
+	write_hex_digits(sw, TRUE, memory_protect, 0);
+	write_hex_digits(in, TRUE, FALSE, 1);
 	write_hex_digits(0, FALSE, FALSE, 2);
 	break;
       case '-':
       case 'W':
-	if (write_protect) {
-	  write_protect = FALSE;
+      case 'M':
+	if (memory_protect) {
+	  memory_protect = FALSE;
 	  digitalWrite(WRITE_N, 0);
 	} else {
-	  write_protect = TRUE;
+	  memory_protect = TRUE;
 	  digitalWrite(WRITE_N, 1);
 	}
 	hi_nibble = TRUE;
 	break;
-      case '+':
+      case '.':
       case 'R':
 	// RUN
-	digitalWrite(WAIT_N, 1);
 	elf_mode = RUN;
 	hi_nibble = TRUE;
+	run_elf();
 	break;
-      case '.':
+      case '+':
       case 'L':
 	// LOAD mode
-	digitalWrite(WAIT_N, 0);
-	digitalWrite(CLEAR_N, 0);
-	usleep(100);
-	// reset
-	digitalWrite(WAIT_N, 1);
-	usleep(100);
-	digitalWrite(WAIT_N, 0);
-	usleep(100);
+	load_elf();
+	reset_elf();
 	adr = 0;
-	if (write_protect) {
-	  elf_mode = LOAD_READ;
-	  // get first byte
-	  digitalWrite(IN_N, 0);
-	  usleep(100);
-	  digitalWrite(IN_N, 1); 
-	} else {
-	  elf_mode = LOAD_WRITE;
-	}
+	memory_protect = TRUE;
+	digitalWrite(WRITE_N, 1);
+	elf_mode = LOAD;
+	// get first byte
+	inc_elf();
 	hi_nibble = TRUE;
 	break;
       }
@@ -350,32 +312,54 @@ int main(int argc, char *argv[]) {
       switch (key) {
       case EOF:
 	// no key pressed
-	// write_hex_digits(read_switches(), TRUE, write_protect, 0);
+	// write_hex_digits(read_switches(), TRUE, memory_protect, 0);
 	write_hex_digits(adr & 0x00FF, FALSE, TRUE, 1);
 	write_hex_digits(adr >> 8, TRUE, FALSE, 2);             
 	break;
-      case '.':
+      case '+':
       case 'L':
+      case 'I':
       case '\n':
 	// address input completed
-	// reset
-	digitalWrite(WAIT_N, 1);
-	usleep(100);
-	digitalWrite(WAIT_N, 0);
-	usleep(100);
+	reset_elf();
 	// count up to adr
+	digitalWrite(WRITE_N, 1);
 	for (i=0; i<adr; i++) {
-	  digitalWrite(IN_N, 0);
-	  digitalWrite(IN_N, 1); 
+	  inc_elf();
 	}
-	if (write_protect) {
-	  elf_mode = LOAD_READ;
+	if (memory_protect) {
 	  // get first byte
-	  digitalWrite(IN_N, 0);
-	  digitalWrite(IN_N, 1); 
+	  inc_elf();
 	} else {
-	  elf_mode = LOAD_WRITE;
+	  digitalWrite(WRITE_N, 0);
 	}
+	elf_mode = LOAD;
+	break;
+      }
+      break;
+    case SWITCH:
+      switch (key) {
+      case EOF:
+	// show switches and LEDs
+	write_hex_digits(sw, TRUE, FALSE, 0);
+	write_hex_digits(in, FALSE, FALSE, 1);
+	write_hex_digits(0, FALSE, FALSE, 2);
+	break;
+      case 0x08: // backspace
+      case 'K':
+      case 'S':
+	// go to the keypad-mode LOAD
+	// LOAD mode
+	load_elf();
+	// reset
+	reset_elf();
+	adr = 0;
+	memory_protect = TRUE;
+	digitalWrite(WRITE_N, 1);
+	// get first byte
+	inc_elf();
+	elf_mode = LOAD;
+	hi_nibble = TRUE;
 	break;
       }
       break;
@@ -408,4 +392,29 @@ int getkey() {
   tcsetattr(fileno(stdin), TCSANOW, &orig_term_attr);
 
   return character;
+}
+
+void inc_elf() {
+  digitalWrite(IN_N, 0);
+  usleep(100);
+  digitalWrite(IN_N, 1); 
+  usleep(100);
+}
+
+void reset_elf() {
+  digitalWrite(WAIT_N, 1);
+  usleep(100);
+  digitalWrite(WAIT_N, 0);
+  usleep(100);
+}
+
+void load_elf() {
+  digitalWrite(WAIT_N, 0);
+  digitalWrite(CLEAR_N, 0);
+  usleep(100);
+}
+
+void run_elf() {
+  digitalWrite(WAIT_N, 1);
+  digitalWrite(CLEAR_N, 1);
 }
