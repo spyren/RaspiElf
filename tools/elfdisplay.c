@@ -40,13 +40,20 @@
 #include <string.h>
 #include <ctype.h>
 #include <wiringPi.h>
+#include <linux/input.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "raspi_gpio.h"
 #include "microdot_phat_hex.h"
 
 typedef enum {LOAD, RUN, WAIT, ADDRESS, SWITCH} elf_mode_t;
 
 // local prototypes
+
+void usage_exit(int err_number, const char *str);
 int getkey();
+int getkeyevent(int fd);
 void inc_elf();
 void reset_elf();
 void load_elf();
@@ -65,6 +72,41 @@ int main(int argc, char *argv[]) {
   uint8_t in;
   uint8_t sw;
   int i;
+  int fd;
+  
+  uint8_t verbose_mode = FALSE;
+  uint8_t input_device = FALSE;
+  int opt;
+  
+  // parse command line options
+  while ((opt = getopt(argc, argv, "v")) != -1) {
+    switch (opt) {
+    case 'v':
+      verbose_mode = TRUE;
+      break;
+    default:
+      usage_exit(EXIT_FAILURE, argv[0]);
+      break;
+    }
+  }
+
+  // parse command
+  if (argc - optind <= 1) {
+    if (argc - optind == 1) {
+      // one parameter left -> filename for device
+      fd = open(argv[optind], O_RDONLY);
+      if (fd < 0) {
+	perror("can not open device.");
+	exit (1);
+      }
+
+      
+      input_device = TRUE;
+    }
+  } else {
+    // too many parameters
+    usage_exit(EXIT_FAILURE, argv[0]);
+  }
   
   if (init_port_mode() != 0) {
     // can't init ports
@@ -110,8 +152,17 @@ int main(int argc, char *argv[]) {
   usleep(1000);
      
   while(key != 'Q') {
-    usleep(20000);
-    key = toupper(getkey());
+    if (input_device) {
+      // get key from event device
+      key = toupper(getkeyevent(fd));
+      if (key == ' ') {
+        printf("wrong key\n");
+      }
+    } else {
+      // get key from stdin
+      usleep(20000);
+      key = toupper(getkey());
+    }
 
     // read hex keys
     if ((key >= '0' && key <= '9') | (key >= 'A' && key <= 'F')) {
@@ -262,7 +313,8 @@ int main(int argc, char *argv[]) {
 	// SWITCH mode
 	// put the switch port to all 1s (the switches on EMC can override)
 	data = 0xFF;
-	// read (the switche on EMC can override)
+	hi_nibble = TRUE;
+	// read (the switch on EMC can override)
 	digitalWrite(WRITE_N, 1);	
 	elf_mode = SWITCH;
       }
@@ -353,9 +405,9 @@ int main(int argc, char *argv[]) {
 	load_elf();
 	// reset
 	reset_elf();
-	adr = 0;
 	memory_protect = TRUE;
 	digitalWrite(WRITE_N, 1);
+	adr = 0;
 	// get first byte
 	inc_elf();
 	elf_mode = LOAD;
@@ -370,6 +422,143 @@ int main(int argc, char *argv[]) {
   exit(0);   
 }
 
+void usage_exit(int err_number, const char *str) {
+  fprintf(stderr, "\
+Usage: %s [-v] [<device-filename>]\n\
+-v verbose\n\
+\n",
+	  str);
+  exit(err_number);
+}
+
+int getkeyevent(int fd) {
+  int k;
+  size_t rb;
+  struct input_event ev;
+  fd_set rfds;
+  struct timeval tv;
+
+  /* Watch fd to see when it has input. */
+  FD_ZERO(&rfds);
+  FD_SET(fd, &rfds);
+  tv.tv_sec = 0;
+  tv.tv_usec = 20000;
+  
+  int retval = select(fd+1, &rfds, NULL, NULL, &tv);
+
+  if (retval == -1) {
+    perror("select()");
+    k = EOF;
+  } else if (retval) {
+    // Data is available now
+    rb=read(fd, &ev, sizeof(struct input_event));
+
+    if (rb < (int) sizeof(struct input_event)) {
+      perror("evtest: short read");
+      k = EOF;
+    }
+
+    if (EV_KEY == ev.type) {
+      // key event
+      if (ev.value == 0 || ev.value == 2) {
+	// key pressed or key repeat
+	switch (ev.code) {
+	case 1:
+	  // escape
+	  k = 'd';
+	  break;
+	case 29:
+	  // Ctrl
+	  k = 'e';
+	  break;
+	case 56:
+	  // Alt
+	  k = 'f';
+	  break;
+	case 14:
+	  // CLR
+	  k = 8;
+	  break;
+	case 69:
+	  // NumLock
+	  k = 'a';
+	  break;
+	case 98:
+	  // /
+	  k = 'b';
+	  break;
+	case 55:
+	  // *
+	  k = 'c';
+	  break;
+	case 74:
+	  // -
+	  k = '-';
+	  break;
+	case 71:
+	  // 7
+	  k = '7';
+	  break;
+	case 72:
+	  // 8
+	  k = '8';
+	  break;
+	case 73:
+	  // 9
+	  k = '9';
+	  break;
+	case 75:
+	  // 4
+	  k = '4';
+	  break;
+	case 76:
+	  // 5
+	  k = '5';
+	  break;
+	case 77:
+	  // 6
+	  k = '6';
+	  break;
+	case 78:
+	  // +
+	  k = '+';
+	  break;
+	case 79:
+	  // 1
+	  k = '1';
+	  break;
+	case 80:
+	  // 2
+	  k = '2';
+	  break;
+	case 81:
+	  // 3
+	  k = '3';
+	  break;
+	case 82:
+	  // 0
+	  k = '0';
+	  break;
+	case 83:
+	  // .
+	  k = '.';
+	  break;
+	case 96:
+	  // Enter
+	  k = '\n';
+	  break;
+	default:
+	  k = ' ';
+	  break;
+	}
+      }
+    }
+  } else {
+    // timeout
+    k = EOF;
+  }
+  return (k);
+}
 
 int getkey() {
   int character;
@@ -380,6 +569,7 @@ int getkey() {
   tcgetattr(fileno(stdin), &orig_term_attr);
   memcpy(&new_term_attr, &orig_term_attr, sizeof(struct termios));
   new_term_attr.c_lflag &= ~(ECHO|ICANON);
+  //new_term_attr.c_lflag &= ~(ICANON);
   new_term_attr.c_cc[VTIME] = 0;
   new_term_attr.c_cc[VMIN] = 0;
   tcsetattr(fileno(stdin), TCSANOW, &new_term_attr);
