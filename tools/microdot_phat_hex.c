@@ -63,7 +63,7 @@
 #define DOT_MATRIX_8x8              0x00
 
   
-const uint8_t font_til311[16][7]={
+static const uint8_t font_til311[16][7]={
   {   // 0 
     0b0110,
     0b1001,
@@ -211,7 +211,7 @@ const uint8_t font_til311[16][7]={
 };
 
 #if debug == 1
-void print_dot(uint8_t row) {
+static void print_dot(uint8_t row) {
 
   int i;
   printf("%2x", row);
@@ -226,7 +226,7 @@ void print_dot(uint8_t row) {
 }
 #endif
 
-uint8_t mirror_5bit(uint8_t input) {
+static uint8_t mirror_5bit(uint8_t input) {
   uint8_t returnval = 0;
   int i;
   for (i = 0; i < 5; ++i) {
@@ -292,9 +292,6 @@ int write_hex_digits(uint8_t data, uint8_t hi_nibble_dp,
     hi_dp = 0xFF;
   }
 
-  wiringPiI2CWriteReg8 (fd, RESET_REGISTER, 0) ;
-  wiringPiI2CWriteReg8 (fd, CONFIGURATION_REGISTER, MATRIX1_AND_MATRIX2 | DOT_MATRIX_8x8) ;
-
   // low nibble
   c = data & 0x0F;
   for (row=0; row<7; row++) { 
@@ -332,6 +329,38 @@ int write_hex_digits(uint8_t data, uint8_t hi_nibble_dp,
 
   wiringPiI2CWriteReg8 (fd, UPDATE_COLUMN_REGISTER, 0) ;
 
+  close(fd);
+}
+
+
+/*
+ ** ===================================================================
+ **  Method      :  clear_display
+ */
+/**
+ *  @brief
+ *      Clears the display
+ *  @return
+ *      int     error number: -1 wiringPi
+ */
+/* ===================================================================*/
+int clear_display(void) {
+
+  int fd;
+  uint8_t row;
+  uint8_t position;
+
+  for (position=0; position<3; position++) {
+    fd = wiringPiI2CSetup(DRIVER_BASE + position);
+    if (fd < 0) {
+      // can't open I2C device
+      return (-1);
+    }
+
+    wiringPiI2CWriteReg8 (fd, RESET_REGISTER, 0) ;
+    wiringPiI2CWriteReg8 (fd, CONFIGURATION_REGISTER, MATRIX1_AND_MATRIX2 | DOT_MATRIX_8x8) ;
+  }
+  
   close(fd);
 }
 

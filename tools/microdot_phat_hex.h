@@ -61,5 +61,18 @@
 int write_hex_digits(uint8_t data, uint8_t hi_nibble_dp, 
 		     uint8_t low_nibble_dp, uint8_t position);
 				     
+/*
+ ** ===================================================================
+ **  Method      :  clear_display
+ */
+/**
+ *  @brief
+ *      Clears the display
+ *  @return
+ *      int     error number: -1 wiringPi
+ */
+/* ===================================================================*/
+int clear_display(void);
+
 
 #endif /* MICRODOT_PHAT_HEX_H_ */

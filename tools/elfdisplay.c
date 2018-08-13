@@ -153,8 +153,10 @@ int main(int argc, char *argv[]) {
 	perror("can not open device.");
 	exit (1);
       }
-
-      
+      if (ioctl(fd, EVIOCGRAB, 1) != 0) {
+	perror("can not set GRAB mode.");
+	exit (1);
+      }
       input_device = TRUE;
     }
   } else {
@@ -174,6 +176,8 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
+  clear_display();
+  
   // clear display
   if (write_hex_digits(0xCD, TRUE, 0, 0) < 0) {
     // can't open I2C
@@ -258,8 +262,10 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    in = read_byte();
-    sw = read_switches();
+    if (elf_mode != SWITCH) {
+      in = read_byte();
+      sw = read_switches();
+    }
     
     // simple statemachine
     switch (elf_mode) {
@@ -319,6 +325,17 @@ int main(int argc, char *argv[]) {
 	hi_byte = TRUE;
 	hexin = adr >> 8;
 	break;
+      case 0x08: // backspace
+      case 'K':
+      case 'S':
+	// SWITCH mode
+	// put the switch port to all 1s (the switches on EMC can override)
+	data = 0xFF;
+	hi_nibble = TRUE;
+	// read (the switch on EMC can override)
+	digitalWrite(WRITE_N, 1);	
+	elf_mode = SWITCH;
+	clear_display();
       }
       break;
     case RUN:
@@ -371,6 +388,7 @@ int main(int argc, char *argv[]) {
 	// read (the switch on EMC can override)
 	digitalWrite(WRITE_N, 1);	
 	elf_mode = SWITCH;
+	clear_display();
       }
       break;
     case WAIT:
@@ -412,6 +430,17 @@ int main(int argc, char *argv[]) {
 	inc_elf();
 	hi_nibble = TRUE;
 	break;
+      case 0x08: // backspace
+      case 'K':
+      case 'S':
+	// SWITCH mode
+	// put the switch port to all 1s (the switches on EMC can override)
+	data = 0xFF;
+	hi_nibble = TRUE;
+	// read (the switch on EMC can override)
+	digitalWrite(WRITE_N, 1);	
+	elf_mode = SWITCH;
+	clear_display();
       }
       break;
     case ADDRESS:
@@ -445,12 +474,6 @@ int main(int argc, char *argv[]) {
       break;
     case SWITCH:
       switch (key) {
-      case EOF:
-	// show switches and LEDs
-	write_hex_digits(sw, TRUE, FALSE, 0);
-	write_hex_digits(in, FALSE, FALSE, 1);
-	write_hex_digits(0, FALSE, FALSE, 2);
-	break;
       case 0x08: // backspace
       case 'K':
       case 'S':
