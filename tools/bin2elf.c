@@ -163,6 +163,8 @@ int main(int argc, char *argv[]) {
   fprintf(stderr, "0x%04x bytes written\n", j);
     
   fclose(fp);
+
+  exit(0);
 }
 
 
