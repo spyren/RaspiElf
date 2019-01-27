@@ -112,25 +112,25 @@ int main(int argc, char *argv[]) {
     if (start_remainder == PAGE_SIZE) {
         start_remainder = 0;
     }
-    end_remainder = end_adr % PAGE_SIZE;
+    end_remainder = (end_adr+1) % PAGE_SIZE;
     
     if (start_remainder != 0) {
         // write start remainder page
         written_bytes = write_page(start_adr, start_remainder);
     }
 
-    pages = (end_adr - start_adr - start_remainder - end_remainder) / PAGE_SIZE;
+    pages = ((end_adr+1) - start_adr - start_remainder - end_remainder) / PAGE_SIZE;
     for (page = 0; page < pages; page++) {
         // write whole pages
         if (end_of_file) {
             break;
         }
-        written_bytes =+ write_page(pages * PAGE_SIZE, PAGE_SIZE);
+        written_bytes += write_page(start_adr + start_remainder + page * PAGE_SIZE, PAGE_SIZE);
     }
 
     if (end_remainder != 0 && !end_of_file) {
         // write end remainder page
-        written_bytes =+ write_page(end_adr - end_remainder, end_remainder);
+        written_bytes += write_page(end_adr - end_remainder + 1, end_remainder);
     }
             
     
@@ -152,12 +152,13 @@ int write_page(uint32_t start, uint16_t count) {
         
     // 24 bit address
     data[1] = start >> 16;
-    data[2] = start & 0x00FFFF >> 8;
+    data[2] = start >> 8 & 0x0000FF;
     data[3] = start & 0x0000FF;
     
     // read data
     for (i = 0; i < count; i++) {
-        if ((data[i+4] = fgetc(fp)) != EOF) {
+        data[i+4] = fgetc(fp);
+		if( feof(fp) ) {
             // reached EOF
             end_of_file = TRUE;
             break;

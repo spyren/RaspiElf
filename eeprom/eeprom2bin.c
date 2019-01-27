@@ -53,16 +53,22 @@
 #include <wiringPiSPI.h>
 #include "eeprom.h"
 
+// function prototypes
+int read_page(uint32_t start, uint16_t count);
 
- 
+static FILE *fp;
+
+
 int main(int argc, char *argv[]) {
-    int i;
     int opt;
-    uint8_t data[END_ADR+1+4];
     uint32_t start_adr = START_ADR;
     uint32_t end_adr = END_ADR;
-    FILE *fp;
     int eeprom_fd;
+    uint32_t read_bytes = 0;
+    uint32_t start_remainder;
+    uint32_t end_remainder;
+    uint32_t pages;
+    uint32_t page;
     
     // parse command line options
     while ((opt = getopt(argc, argv, "s:e:")) != -1) {
@@ -100,25 +106,31 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
     
-    // no pages required for EEPROM read operation
+    // pages required for EEPROM read operation
+    start_remainder = PAGE_SIZE - (start_adr % PAGE_SIZE);
+    if (start_remainder == PAGE_SIZE) {
+        start_remainder = 0;
+    }
+    end_remainder = (end_adr+1) % PAGE_SIZE;
     
-    // prepare for read
-    data[0] = READ_CMD;
-    
-    // 24 bit address
-    data[1] = start_adr >> 16;
-    data[2] = start_adr & 0x00FFFF >> 8;
-    data[3] = start_adr & 0x0000FF;
-    
-    // read the eeprom
-    wiringPiSPIDataRW (CHANNEL, &data[0], end_adr - start_adr + 4) ;     
-    
-    // write data to the file
-    for(i = start_adr + 4; i <= end_adr + 4; i++) {
-        fputc(data[i], fp);
+    if (start_remainder != 0) {
+        // read start remainder page
+        read_bytes = read_page(start_adr, start_remainder);
     }
 
-    fprintf(stderr, "0x%05x bytes read\n", end_adr - start_adr);
+    pages = ((end_adr+1) - start_adr - start_remainder - end_remainder) / PAGE_SIZE;
+    for (page = 0; page < pages; page++) {
+        // read whole pages
+        read_bytes += read_page(start_adr + start_remainder + page * PAGE_SIZE, PAGE_SIZE);
+    }
+
+    if (end_remainder != 0) {
+        // read end remainder page
+        read_bytes +=read_page(end_adr - end_remainder + 1, end_remainder);
+    }
+    
+
+    fprintf(stderr, "0x%05x bytes read\n", read_bytes);
     
     fclose(fp);
     
@@ -126,4 +138,26 @@ int main(int argc, char *argv[]) {
 
 }
 
+int read_page(uint32_t start, uint16_t count) {
+    uint16_t i;
+    uint8_t data[PAGE_SIZE+4];
+
+    // prepare for read
+    data[0] = READ_CMD;
+    
+    // 24 bit address
+    data[1] = start >> 16;
+    data[2] = start >> 8 & 0x0000FF;
+    data[3] = start & 0x0000FF;
+    
+    // read the eeprom
+    wiringPiSPIDataRW (CHANNEL, &data[0], count + 4) ;     
+    
+    // write data to the file
+    for(i = 4; i < count + 4; i++) {
+        fputc(data[i], fp);
+    }
+    
+    return count;
+}
 
