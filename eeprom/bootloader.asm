@@ -63,7 +63,7 @@ BOOTLOADER
 		LDI	WRITEBYTE AND 0FFH
 		PLO	R1
 		SEX	R2		; Rx for OUT
-		OUT	P2		; deactivate CS to start operation
+		OUT	P1		; deactivate CS to start operation
 		
 		SEX	R0		; for immediate OUT 
 		LDI	03H		; EEPROM read command
@@ -82,7 +82,7 @@ BLOCKLOOP	GLO	R1		; init read byte
 		PHI	R6          
 		LDI	0FFH - 8	; counting up 8 times
 		PLO	R6		; bit counter
-RDBITLOOP	OUT	P1		; CLK for SPI, INC Rx
+RDBITLOOP	OUT	P2		; CLK for SPI, INC Rx
 		GHI	R6		; set CARRY
 		SHRC
 		GLO	R5
@@ -104,7 +104,7 @@ SAVEBIT  	PLO	R5
 		OUT	P4		; show page count on LEDs
 		DEC	R2
 		BNZ	BLOCKLOOP-1
-		OUT	P2		; deactivate CS to stop operation
+		OUT	P1		; deactivate CS to stop operation
 		LBR	08000H
 
 		SEP	R0
@@ -115,10 +115,10 @@ WRBITLOOP	GLO	R5		; get the next bit
 		SHLC			; next bit is in the carry
 		PLO	R5
 		LSNF
-		OUT	P1
+		OUT	P2
 		BYTE	00000000B	; CLK for SPI with data bit cleared
 		LSDF
-		OUT	P1
+		OUT	P2
 		BYTE	00000001B	; CLK for SPI with data bit set 
 		DEC	R6
 		GLO	R6
