@@ -48,36 +48,36 @@ P7		EQU	7
 ; R8   length
 
 
-BOOTLOADER	
+BOOTLOADER
 		LDI	080H		; set destination address
 		PHI	R7
 		LDI	080H		; set length
 		PHI	R8
-		GLO	R0
-		PLO	R7
-		PLO	R8
-		PHI	R1
-		PLO	R2
+		GHI	R0		; D = 00H
+		PLO	R7		; destination address begins at page
+		PLO	R8		; lenght in pages
+		PHI	R1		; high byte subroutine
+		PLO	R2		; stack pointer = 0100H 
 		LDI	01H
 		PHI	R2
-		LDI	WRITEBYTE AND 0FFH
+		LDI	LOW WRITEBYTE 	; low byte subroutine
 		PLO	R1
-		SEX	R2		; Rx for OUT
 		OUT	P1		; deactivate CS to start operation
+		BYTE	00H
 		
-		SEX	R0		; for immediate OUT 
+		SEX	R1		; for immediate OUT in subroutine 
 		LDI	03H		; EEPROM read command
 		SEP	R1		; CALL WRITEBYTE
-		GLO	R0		; address bit 17 to 24
+		GHI	R0		; address bit 17 to 24 = 0
 		SEP	R1		; CALL WRITEBYTE
-		GLO	R0		; address bit 8 to 16
+		GHI	R0		; address bit 8 to 16 = 0
 		SEP	R1		; CALL WRITEBYTE
-		GLO	R0		; address bit 0 to 7
+		GHI	R0		; address bit 0 to 7 = 0
 		SEP	R1		; CALL WRITEBYTE
 
 		SEX	R6		; Rx for OUT
-BLOCKLOOP	GLO	R1		; init read byte
-		PLO	R5 
+BLOCKLOOP	GHI	R0		; D = 0
+		PLO	R5 		; reset all bits
 		LDI	0FFH		; for the carry bits
 		PHI	R6          
 		LDI	0FFH - 8	; counting up 8 times

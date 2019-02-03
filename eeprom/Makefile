@@ -7,7 +7,13 @@
 #	Peter Schmid peter@spyr.ch
 # @date
 # 	2019-01-25
-all: eeprom2bin bin2eeprom 
+all: eeprom2bin bin2eeprom bootloader.bin
+
+bootloader.bin: bootloader.hex
+	hex2bin bootloader.hex
+	
+bootloader.hex: bootloader.asm
+	a18 bootloader.asm -Lb1 bootloader.lst -o bootloader.hex 
 
 eeprom2bin: eeprom2bin.o 
 	cc -g -o eeprom2bin -lwiringPi eeprom2bin.o
