@@ -43,7 +43,7 @@ P7		EQU	7
 ; R2   stack pointer
 ; R5.0 byte (read/write)
 ; R6.0 bit counter
-; R6.1 carry bits
+; R4.0 carry bits
 ; R7   destination address 
 ; R8   length
 
@@ -62,15 +62,17 @@ BOOTLOADER
 		PHI	R2
 		LDI	LOW WRITEBYTE 	; low byte subroutine
 		PLO	R1
+		LDI	01H		; for the carry
+		PLO	R4          
 		OUT	P1		; deactivate CS to start operation
 		BYTE	00H
 		
 		SEX	R1		; for immediate OUT in subroutine 
 		LDI	03H		; EEPROM read command
 		SEP	R1		; CALL WRITEBYTE
-		GHI	R0		; address bit 17 to 24 = 0
+		GHI	R0		; address bit 16 to 23 = 0
 		SEP	R1		; CALL WRITEBYTE
-		GHI	R0		; address bit 8 to 16 = 0
+		GHI	R0		; address bit 8 to 15 = 0
 		SEP	R1		; CALL WRITEBYTE
 		GHI	R0		; address bit 0 to 7 = 0
 		SEP	R1		; CALL WRITEBYTE
@@ -78,23 +80,22 @@ BOOTLOADER
 		SEX	R6		; Rx for OUT
 BLOCKLOOP	GHI	R0		; D = 0
 		PLO	R5 		; reset all bits
-		LDI	0FFH		; for the carry bits
-		PHI	R6          
-		LDI	0FFH - 8	; counting up 8 times
+		LDI	0 - 8		; counting up 8 times
 		PLO	R6		; bit counter
-RDBITLOOP	OUT	P2		; CLK for SPI, INC Rx
-		GHI	R6		; set CARRY
-		SHRC
+RDBITLOOP	GLO	R4		; set CARRY
+		SHR
 		GLO	R5
-		B2	SETBIT		; branch if bit set
+		BN2	SETBIT		; branch if bit set (EF2 == 0)
 		SHL			; bit not set
 		BR	SAVEBIT      
 SETBIT  	SHLC
-SAVEBIT  	PLO	R5
+SAVEBIT 	OUT	P2		; CLK for SPI, INC Rx 	
+		PLO	R5
 		GLO	R6
 		BNZ	RDBITLOOP
 		GLO	R5		; get byte
-		STR	R7		; save byte		
+		STR	R7		; save byte
+		INC	R7		
 		DEC	R8
 		GLO	R8
 		BNZ	BLOCKLOOP
@@ -105,21 +106,22 @@ SAVEBIT  	PLO	R5
 		DEC	R2
 		BNZ	BLOCKLOOP-1
 		OUT	P1		; deactivate CS to stop operation
-		LBR	08000H
+WAIT		LBR	WAIT
+;		LBR	08000H
 
 		SEP	R0
 WRITEBYTE	PLO	R5		; save transmit byte
-		LDI	8
+		LDI	8		; counter 8 bits
 		PLO	R6
 WRBITLOOP	GLO	R5		; get the next bit
-		SHLC			; next bit is in the carry
+		SHL			; next bit is in the carry
 		PLO	R5
-		LSNF
+		LSNF			; skip if bit is 0
 		OUT	P2
-		BYTE	00000000B	; CLK for SPI with data bit cleared
-		LSDF
+		BYTE	00000001B	; CLK for SPI with data bit cleared
+		LSDF			; skip if bit is 1
 		OUT	P2
-		BYTE	00000001B	; CLK for SPI with data bit set 
+		BYTE	00000000B	; CLK for SPI with data bit set 
 		DEC	R6
 		GLO	R6
 		BNZ	WRBITLOOP
