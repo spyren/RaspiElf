@@ -54,16 +54,15 @@ BOOTLOADER
 		LDI	080H		; set length
 		PHI	R8
 		GHI	R0		; D = 00H
-		PLO	R7		; destination address begins at page
-		PLO	R8		; lenght in pages
+		PLO	R7		; destination address page boundry
+		PLO	R8		; length in pages
 		PHI	R1		; high byte subroutine
 		PLO	R2		; stack pointer = 0100H 
 		LDI	01H
 		PHI	R2
+		PLO	R4		; for the carry          
 		LDI	LOW WRITEBYTE 	; low byte subroutine
 		PLO	R1
-		LDI	01H		; for the carry
-		PLO	R4          
 		OUT	P1		; deactivate CS to start operation
 		BYTE	00H
 		
@@ -71,9 +70,11 @@ BOOTLOADER
 		LDI	03H		; EEPROM read command
 		SEP	R1		; CALL WRITEBYTE
 		GHI	R0		; address bit 16 to 23 = 0
-		SEP	R1		; CALL WRITEBYTE
+		SEP	R1		; CALL WRITEBYTE, replace by NOP for
+					; 8 to 512 Kibit EEPROMs
 		GHI	R0		; address bit 8 to 15 = 0
-		SEP	R1		; CALL WRITEBYTE
+		SEP	R1		; CALL WRITEBYTE, replace by NOP for
+					; 1 to 4 Kibit EEPROMs
 		GHI	R0		; address bit 0 to 7 = 0
 		SEP	R1		; CALL WRITEBYTE
 
@@ -87,7 +88,8 @@ RDBITLOOP	GLO	R4		; set CARRY
 		GLO	R5
 		BN2	SETBIT		; branch if bit set (EF2 == 0)
 		SHL			; bit not set
-		BR	SAVEBIT      
+;		BR	SAVEBIT      
+		SKP
 SETBIT  	SHLC
 SAVEBIT 	OUT	P2		; CLK for SPI, INC Rx 	
 		PLO	R5
@@ -102,12 +104,12 @@ SAVEBIT 	OUT	P2		; CLK for SPI, INC Rx
 		SEX	R2		; one page finished
 		GHI	R8
 		STR	R2
-		OUT	P4		; show page count on LEDs
+		OUT	P4		; show left pages on LEDs
 		DEC	R2
 		BNZ	BLOCKLOOP-1
 		OUT	P1		; deactivate CS to stop operation
-WAIT		LBR	WAIT
-;		LBR	08000H
+		SEX	R0
+		LBR	08000H		; start loaded program
 
 		SEP	R0
 WRITEBYTE	PLO	R5		; save transmit byte
