@@ -46,16 +46,20 @@ P7		EQU	7
 ; R4.0 carry bits
 ; R7   destination address 
 ; R8   length
+; R9   start address
 
-
+START
+		LBR	BOOTLOADER
 BOOTLOADER
 		LDI	080H		; set destination address
 		PHI	R7
+		PHI	R9		; start address
 		LDI	080H		; set length
 		PHI	R8
 		GHI	R0		; D = 00H
 		PLO	R7		; destination address page boundry
 		PLO	R8		; length in pages
+		PLO	R9
 		PHI	R1		; high byte subroutine
 		PLO	R2		; stack pointer = 0100H 
 		LDI	01H
@@ -71,7 +75,7 @@ BOOTLOADER
 		SEP	R1		; CALL WRITEBYTE
 		GHI	R0		; address bit 16 to 23 = 0
 		SEP	R1		; CALL WRITEBYTE, replace by NOP for
-					; 8 to 512 Kibit EEPROMs
+					; 1 to 512 Kibit EEPROMs
 		GHI	R0		; address bit 8 to 15 = 0
 		SEP	R1		; CALL WRITEBYTE, replace by NOP for
 					; 1 to 4 Kibit EEPROMs
@@ -85,14 +89,13 @@ BLOCKLOOP	GHI	R0		; D = 0
 		PLO	R6		; bit counter
 RDBITLOOP	GLO	R4		; set CARRY
 		SHR
-		GLO	R5
+		GLO	R5		; get bits
 		BN2	SETBIT		; branch if bit set (EF2 == 0)
 		SHL			; bit not set
-;		BR	SAVEBIT      
-		SKP
-SETBIT  	SHLC
+		SKP			; BR SAVEBIT
+SETBIT  	SHLC			; set bit
 SAVEBIT 	OUT	P2		; CLK for SPI, INC Rx 	
-		PLO	R5
+		PLO	R5		; save bits
 		GLO	R6
 		BNZ	RDBITLOOP
 		GLO	R5		; get byte
@@ -109,7 +112,13 @@ SAVEBIT 	OUT	P2		; CLK for SPI, INC Rx
 		BNZ	BLOCKLOOP-1
 		OUT	P1		; deactivate CS to stop operation
 		SEX	R0
-		LBR	08000H		; start loaded program
+		INC	R8		; set R8 to 0001h
+		GHI	R9		; store start address
+		STR	R8
+		INC	R8
+		GLO	R9
+		STR	R8
+		BR	START
 
 		SEP	R0
 WRITEBYTE	PLO	R5		; save transmit byte
