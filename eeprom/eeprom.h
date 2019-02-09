@@ -49,6 +49,7 @@
 #define WRITE_IN_PROCESS    (0x01)
  
 #define PAGE_SIZE   (256)
+#define ADDRESS_BITS (24)
 
 #endif /* EEPROM_H_ */
 
