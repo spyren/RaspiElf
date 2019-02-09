@@ -90,13 +90,13 @@ int main(int argc, char *argv[]) {
                 end_adr = strtol(optarg, NULL, 16);
                 break;
             case 'p': 
-                page_size = strtol(optarg, NULL, 16);
+                page_size = strtol(optarg, NULL, 10);
                 break;
             case 'a': 
-                address_bits = strtol(optarg, NULL, 16);
+                address_bits = strtol(optarg, NULL, 10);
                 break;
             case 'k': 
-                size = strtol(optarg, NULL, 16);
+                size = strtol(optarg, NULL, 10);
                 break;
             default:
                 fprintf(stderr, 
@@ -119,44 +119,44 @@ int main(int argc, char *argv[]) {
       page_size = 16;
       break;
     case 4:
-      address_bits = 8;
+      address_bits = 16;
       page_size = 16;
       break;
     case 8:
-      address_bits = 8;
+      address_bits = 16;
       page_size = 16;
       break;
     case 16:
-      address_bits = 8;
+      address_bits = 16;
       page_size = 16;
       break;
     case 32:
-      address_bits = 8;
-      page_size = 16;
+      address_bits = 16;
+      page_size = 32;
       break;
     case 64:
-      address_bits = 8;
-      page_size = 16;
+      address_bits = 16;
+      page_size = 32;
       break;
     case 128:
-      address_bits = 8;
-      page_size = 16;
+      address_bits = 16;
+      page_size = 64;
       break;
     case 256:
-      address_bits = 8;
-      page_size = 16;
+      address_bits = 16;
+      page_size = 64;
       break;
     case 512:
-      address_bits = 8;
-      page_size = 16;
+      address_bits = 16;
+      page_size = 256;
       break;
     case 1024:
-      address_bits = 8;
-      page_size = 16;
+      address_bits = 24;
+      page_size = 256;
       break;
     case 2048:
-      address_bits = 8;
-      page_size = 16;
+      address_bits = 24;
+      page_size = 256;
       break;
     default:
       // invalid size
