@@ -61,12 +61,11 @@ BOOTLOADER
 		PLO	R8		; length in pages
 		PLO	R9
 		PHI	R1		; high byte subroutine
-		PLO	R2		; stack pointer = 0100H 
 		LDI	01H
-		PHI	R2
 		PLO	R4		; for the carry          
 		LDI	LOW WRITEBYTE 	; low byte subroutine
 		PLO	R1
+		SEX	R0
 		OUT	P4		; deactivate CS to cancel operation
 		BYTE	00100000b
 		OUT	P4		; activate CS to start operation
@@ -114,9 +113,6 @@ SAVEBIT 	OUT	P4		; CLK on for SPI
 		BNZ	BLOCKLOOP
 		OUT	P4		; deactivate CS to stop operation
 		BYTE	00100000B
-WAIT		BR	WAIT
-
-		SEX	R0
 		INC	R8		; set R8 to 0001h
 		GHI	R9		; store start address
 		STR	R8
